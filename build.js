@@ -48,6 +48,17 @@ if (fs.existsSync(SHOTS)) {
 // inject the map just before the page's main <script> so it's defined first
 html = html.replace('<script>', `<script>window.__SHOTS__ = ${JSON.stringify(shotMap)};</script>\n<script>`);
 
+// PLAIN mode: publish the self-contained page WITHOUT the password gate
+if (process.env.PLAIN) {
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  fs.writeFileSync(path.join(OUT_DIR, 'index.html'), html);
+  fs.writeFileSync(path.join(OUT_DIR, '.nojekyll'), '');
+  console.log('Built docs/index.html (PLAIN — no password)');
+  console.log('  screenshots inlined : ' + inlined);
+  console.log('  page size           : ' + (Buffer.byteLength(html) / 1024).toFixed(0) + ' KB');
+  process.exit(0);
+}
+
 // 3. encrypt ------------------------------------------------------------------
 const salt = crypto.randomBytes(16);
 const iv = crypto.randomBytes(12);

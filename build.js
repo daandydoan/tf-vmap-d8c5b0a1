@@ -24,7 +24,7 @@ const SRC = path.join(ROOT, 'index.html');
 const SHOTS = path.join(ROOT, 'shots');
 const OUT_DIR = path.join(ROOT, 'docs');
 const PASSWORD = process.env.SITE_PASSWORD || 'Tenderfy@2026';
-const ITERATIONS = 200000;
+const ITERATIONS = 600000; // OWASP-recommended floor for PBKDF2-SHA256; slows offline brute-force
 
 // 1. source HTML --------------------------------------------------------------
 let html = fs.readFileSync(SRC, 'utf8');

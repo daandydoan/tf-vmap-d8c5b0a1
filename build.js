@@ -80,12 +80,15 @@ const gate = `<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 <title>Tenderfy — protected</title>
 <style>
   :root{--teal:#179e77;--teal-dark:#0f6e56;--ink:#1f2422;--muted:#6b726e;--line:#e3e6e3;--bg:#f6f7f5}
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  body{font-family:'Outfit',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--bg);color:var(--ink);display:flex;align-items:center;justify-content:center;min-height:100vh}
   .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:30px 28px;width:340px;
     box-shadow:0 10px 40px rgba(20,40,30,.08);text-align:center}

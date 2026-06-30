@@ -33,42 +33,46 @@
   .howto code{background:var(--pill);color:var(--teal-dark);padding:2px 7px;border-radius:6px;
     font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
 
-  section.group{margin-top:34px}
-  section.group > h2{font-size:15px;font-weight:600;margin:0 0 4px;color:var(--ink);
-    display:flex;align-items:center;gap:9px}
-  section.group > h2 .count{font-size:12px;font-weight:500;color:var(--muted);
-    background:var(--pill);border-radius:20px;padding:1px 9px}
-  section.group > .lead{font-size:13px;color:var(--muted);margin:0 0 16px}
+  /* site map (left-to-right tree) */
+  .sitemap{position:relative;display:flex;align-items:flex-start;padding:8px 0 4px;margin-top:6px}
+  .sm-lines{position:absolute;inset:0;z-index:0;pointer-events:none}
+  .sm-lines path{fill:none;stroke:#c7cfc9;stroke-width:1.5}
+  .sm-root{position:relative;z-index:1;flex:0 0 auto;margin-right:60px;display:flex;flex-direction:column;gap:10px;width:158px}
+  .rootnode{background:var(--teal-dark);color:#fff;border-radius:12px;padding:12px 15px;font-size:14px;font-weight:600;line-height:1.25}
+  .rootnode small{display:block;font-weight:400;font-size:10px;opacity:.85;margin-top:4px;font-family:var(--mono);line-height:1.35}
+  .shells{font-size:11px;color:var(--muted);line-height:1.45}
+  .shells b{color:var(--ink);font-weight:600}
+  .sm-branches{position:relative;z-index:1;display:flex;flex-direction:column;gap:16px}
+  .branch{display:flex;align-items:center;gap:60px}
+  .cat{flex:0 0 auto;width:170px;background:var(--pill);border:1px solid #cfe2da;border-radius:10px;
+    padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .cat .cn{font-size:13.5px;font-weight:600;color:var(--teal-dark)}
+  .cat .cc{font-size:11px;font-weight:500;color:#fff;background:var(--teal);border-radius:20px;padding:1px 8px}
+  .leaves{display:flex;flex-direction:column;gap:11px}
+  .leaf{display:flex;align-items:stretch;gap:10px;width:300px;background:var(--card);border:1px solid var(--line);
+    border-radius:10px;overflow:hidden;cursor:zoom-in;transition:box-shadow .15s,transform .15s}
+  .leaf:hover{box-shadow:0 6px 18px rgba(20,40,30,.10);transform:translateY(-1px)}
+  .leaf.sub{border-style:dashed}
+  .lthumb{position:relative;flex:0 0 108px;height:68px;background:#f0f2f0;overflow:hidden}
+  .lthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+  .lthumb img.missing{display:none}
+  .lthumb .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#aab2ac;
+    background:repeating-linear-gradient(45deg,#f3f5f3,#f3f5f3 10px,#eef1ee 10px,#eef1ee 20px)}
+  .lthumb .ph svg{width:20px;height:20px;opacity:.6}
+  .lthumb img:not(.missing) + .ph{display:none}
+  .lmeta{flex:1 1 auto;min-width:0;padding:8px 10px 8px 0;display:flex;flex-direction:column;justify-content:center;gap:3px}
+  .ln{font-size:13px;font-weight:600;color:var(--ink);line-height:1.2;display:flex;align-items:center;gap:7px}
+  .ln a.ext{flex:none;color:var(--muted);display:inline-flex;cursor:pointer}
+  .ln a.ext:hover{color:var(--teal-dark)}
+  .ln a.ext svg{width:12px;height:12px}
+  .lr{font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px}
-
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s}
-  .card:hover{box-shadow:0 8px 24px rgba(20,40,30,.10);transform:translateY(-2px)}
-
-  .thumb{position:relative;aspect-ratio:16/10;background:#f0f2f0;overflow:hidden}
-  .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;
-    display:block;background:#fff}
-  .thumb img.missing{display:none}
-  .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:8px;color:#9aa39e;background:
-      repeating-linear-gradient(45deg,#f3f5f3,#f3f5f3 12px,#eef1ee 12px,#eef1ee 24px)}
-  .ph svg{width:30px;height:30px;opacity:.55}
-  .ph .fn{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;
-    color:#7d857f;background:#fff;border:1px solid var(--line);border-radius:6px;padding:2px 8px}
-  .thumb img:not(.missing) + .ph{display:none}
-
-  .meta{padding:13px 15px 14px;display:flex;flex-direction:column;gap:7px}
-  .meta .name{font-size:14.5px;font-weight:600;color:var(--ink)}
-  .meta .route{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;
-    color:var(--muted);word-break:break-all}
-  .meta .note{font-size:12.5px;color:var(--muted)}
-  .meta .foot{display:flex;align-items:center;gap:10px;margin-top:3px}
-  .badge{font-size:11px;font-weight:500;border-radius:20px;padding:2px 9px;background:var(--pill);
-    color:var(--teal-dark)}
-  .badge.sub{background:#eef1f6;color:#3a5a86}
-  .open{margin-left:auto;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
-  .open svg{width:13px;height:13px}
+  /* click-to-zoom lightbox for the small map thumbnails */
+  .lb{position:fixed;inset:0;background:rgba(15,25,20,.82);display:flex;align-items:center;justify-content:center;
+    z-index:50;padding:22px;cursor:zoom-out}
+  .lb[hidden]{display:none}
+  .lb img{max-width:94vw;max-height:92vh;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+  .lb .cap{position:fixed;top:16px;left:0;right:0;text-align:center;color:#eaf3ee;font-size:13px}
 
   .open.disabled{margin-left:auto;font-size:12.5px;color:var(--muted);opacity:.6}
 
@@ -185,39 +189,83 @@ const groups = [
 const camIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="4"/></svg>';
 const extIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg>';
 
+// ---- render the navigation as a left-to-right tree map -----------------------
 const root = document.getElementById("groups");
+const sm = document.createElement("div");
+sm.className = "sitemap"; sm.id = "sm";
+sm.innerHTML = `<svg class="sm-lines"></svg>
+  <div class="sm-root">
+    <div class="rootnode">Tenderfy Business Admin<small>staging · stgbusinessadmin.tenderfy.org</small></div>
+    <div class="shells">Persistent on every page: <b>top header</b> (Home · AI Manager · Support · Settings · Notifications · Profile) &amp; collapsible <b>left sidebar</b>.</div>
+  </div>`;
+const branches = document.createElement("div");
+branches.className = "sm-branches";
+
 for(const g of groups){
-  const sec = document.createElement("section");
-  sec.className = "group";
-  sec.innerHTML = `<h2>${g.title} <span class="count">${g.pages.length}</span></h2><p class="lead">${g.lead}</p>`;
-  const grid = document.createElement("div");
-  grid.className = "grid";
+  const br = document.createElement("div");
+  br.className = "branch";
+  br.innerHTML = `<div class="cat"><span class="cn">${g.title}</span><span class="cc">${g.pages.length}</span></div>`;
+  const leaves = document.createElement("div");
+  leaves.className = "leaves";
   for(const p of g.pages){
-    const card = document.createElement("div");
-    card.className = "card";
     const src = (window.__SHOTS__ && window.__SHOTS__[p.file]) || `shots/${p.file}.png`;
-    card.innerHTML = `
-      <div class="thumb">
-        <img src="${src}" alt="${p.name} screenshot" loading="lazy"
-             onerror="this.classList.add('missing')">
-        <div class="ph">${camIcon}<span class="fn">shots/${p.file}.png</span></div>
-      </div>
-      <div class="meta">
-        <div class="name">${p.name}</div>
-        <div class="route">${p.route}</div>
-        <div class="note">${p.note}</div>
-        <div class="foot">
-          <span class="badge${p.sub?' sub':''}">${p.sub?'subpage':'section'}</span>
-          ${p.noopen
-            ? `<span class="open disabled">in-page view</span>`
-            : `<a class="open" href="${BASE}${p.route}" target="_blank" rel="noopener">Open live ${extIcon}</a>`}
-        </div>
+    const leaf = document.createElement("div");
+    leaf.className = "leaf" + (p.sub ? " sub" : "");
+    leaf.title = p.note || "";
+    leaf.innerHTML = `
+      <div class="lthumb"><img src="${src}" alt="${p.name}" loading="lazy" onerror="this.classList.add('missing')"><div class="ph">${camIcon}</div></div>
+      <div class="lmeta">
+        <div class="ln">${p.name}${p.noopen ? "" : `<a class="ext" href="${BASE}${p.route}" target="_blank" rel="noopener" title="Open live" onclick="event.stopPropagation()">${extIcon}</a>`}</div>
+        <div class="lr">${p.route}</div>
       </div>`;
-    grid.appendChild(card);
+    leaf.addEventListener("click", () => openLB(src, p.name + "  ·  " + p.route));
+    leaves.appendChild(leaf);
   }
-  sec.appendChild(grid);
-  root.appendChild(sec);
+  br.appendChild(leaves);
+  branches.appendChild(br);
 }
+sm.appendChild(branches);
+root.appendChild(sm);
+
+// lightbox (small map thumbnails -> full screenshot on click)
+const lb = document.createElement("div");
+lb.className = "lb"; lb.hidden = true;
+lb.innerHTML = `<div class="cap"></div><img alt="">`;
+document.body.appendChild(lb);
+lb.addEventListener("click", () => { lb.hidden = true; });
+function openLB(src, cap){
+  if (!src) return;
+  lb.querySelector("img").src = src;
+  lb.querySelector(".cap").textContent = cap;
+  lb.hidden = false;
+}
+
+// draw the connector lines (root -> categories, category -> its leaves)
+const svg = sm.querySelector(".sm-lines");
+function pos(el){
+  const r = el.getBoundingClientRect(), s = sm.getBoundingClientRect();
+  return { l: r.left - s.left, r: r.right - s.left, cy: (r.top + r.bottom) / 2 - s.top };
+}
+function elbow(a, b){
+  const mx = a.r + Math.max(16, (b.l - a.r) / 2);
+  return `M${a.r.toFixed(1)} ${a.cy.toFixed(1)} H${mx.toFixed(1)} V${b.cy.toFixed(1)} H${b.l.toFixed(1)}`;
+}
+function drawLines(){
+  const w = sm.offsetWidth, h = sm.offsetHeight;
+  svg.setAttribute("width", w); svg.setAttribute("height", h);
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+  const rp = pos(sm.querySelector(".rootnode"));
+  let d = "";
+  for(const cat of sm.querySelectorAll(".cat")) d += elbow(rp, pos(cat)) + " ";
+  for(const b of sm.querySelectorAll(".branch")){
+    const cp = pos(b.querySelector(".cat"));
+    for(const lf of b.querySelectorAll(".leaf")) d += elbow(cp, pos(lf)) + " ";
+  }
+  svg.innerHTML = `<path d="${d.trim()}"/>`;
+}
+requestAnimationFrame(drawLines);
+window.addEventListener("load", drawLines);
+window.addEventListener("resize", drawLines);
 
 /* ---- Flow deep-dives, drawn as flow maps ---- */
 const deepDives = [

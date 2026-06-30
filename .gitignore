@@ -1,0 +1,17 @@
+# SECRETS — never commit. .pw-profile holds a live Tenderfy login session.
+.pw-profile/
+.pw-smoketest/
+
+# dependencies
+node_modules/
+
+# Plaintext screenshots are sensitive (they show real tender data). Only the
+# ENCRYPTED build (docs/index.html, with images inlined + encrypted) is published.
+shots/*.png
+shots/*.jpg
+shots/*.jpeg
+shots/*.webp
+
+# misc
+*.log
+.DS_Store

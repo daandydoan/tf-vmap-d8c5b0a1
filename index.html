@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tenderfy Business Admin — Visual Sitemap</title>
+<style>
+  :root{
+    --teal:#179e77; --teal-dark:#0f6e56; --ink:#1f2422; --muted:#6b726e;
+    --line:#e3e6e3; --bg:#f6f7f5; --card:#ffffff; --pill:#eef4f1; --radius:14px;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.55; -webkit-font-smoothing:antialiased}
+  a{color:var(--teal-dark); text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  header.top{position:sticky; top:0; z-index:10; background:var(--teal);
+    color:#fff; padding:18px 28px; display:flex; align-items:center; gap:16px;
+    box-shadow:0 1px 0 rgba(0,0,0,.06)}
+  header.top .mark{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.18);
+    display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px}
+  header.top h1{font-size:18px;font-weight:600;margin:0;letter-spacing:.2px}
+  header.top .sub{font-size:13px;opacity:.85;margin-left:auto;font-weight:400}
+
+  .wrap{max-width:1320px;margin:0 auto;padding:26px 28px 70px}
+
+  .howto{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 20px;margin-bottom:26px;font-size:13.5px;color:var(--muted)}
+  .howto b{color:var(--ink);font-weight:600}
+  .howto code{background:var(--pill);color:var(--teal-dark);padding:2px 7px;border-radius:6px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+
+  section.group{margin-top:34px}
+  section.group > h2{font-size:15px;font-weight:600;margin:0 0 4px;color:var(--ink);
+    display:flex;align-items:center;gap:9px}
+  section.group > h2 .count{font-size:12px;font-weight:500;color:var(--muted);
+    background:var(--pill);border-radius:20px;padding:1px 9px}
+  section.group > .lead{font-size:13px;color:var(--muted);margin:0 0 16px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s}
+  .card:hover{box-shadow:0 8px 24px rgba(20,40,30,.10);transform:translateY(-2px)}
+
+  .thumb{position:relative;aspect-ratio:16/10;background:#f0f2f0;overflow:hidden}
+  .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;
+    display:block;background:#fff}
+  .thumb img.missing{display:none}
+  .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;color:#9aa39e;background:
+      repeating-linear-gradient(45deg,#f3f5f3,#f3f5f3 12px,#eef1ee 12px,#eef1ee 24px)}
+  .ph svg{width:30px;height:30px;opacity:.55}
+  .ph .fn{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;
+    color:#7d857f;background:#fff;border:1px solid var(--line);border-radius:6px;padding:2px 8px}
+  .thumb img:not(.missing) + .ph{display:none}
+
+  .meta{padding:13px 15px 14px;display:flex;flex-direction:column;gap:7px}
+  .meta .name{font-size:14.5px;font-weight:600;color:var(--ink)}
+  .meta .route{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;
+    color:var(--muted);word-break:break-all}
+  .meta .note{font-size:12.5px;color:var(--muted)}
+  .meta .foot{display:flex;align-items:center;gap:10px;margin-top:3px}
+  .badge{font-size:11px;font-weight:500;border-radius:20px;padding:2px 9px;background:var(--pill);
+    color:var(--teal-dark)}
+  .badge.sub{background:#eef1f6;color:#3a5a86}
+  .open{margin-left:auto;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
+  .open svg{width:13px;height:13px}
+
+  .open.disabled{margin-left:auto;font-size:12.5px;color:var(--muted);opacity:.6}
+
+  .deep{margin-top:46px}
+  .deep > h2{font-size:16px;font-weight:600;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  .deep > h2 .tag{font-size:11px;font-weight:500;color:#3a5a86;background:#eef1f6;border-radius:20px;padding:2px 10px}
+  .deep > .lead{font-size:13px;color:var(--muted);margin:0 0 18px}
+  /* flow map */
+  .maplegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 18px;font-size:11.5px;color:var(--muted)}
+  .maplegend span{display:inline-flex;align-items:center;gap:6px}
+  .maplegend i{width:11px;height:11px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.08)}
+  .mapcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px 6px;margin-bottom:14px}
+  .lane{padding:10px 0}
+  .lane + .lane{border-top:1px dashed var(--line)}
+  .lane-label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--teal-dark);margin:0 0 10px}
+  .pipe{display:flex;align-items:stretch;overflow-x:auto;padding-bottom:4px}
+  .col{display:flex;flex-direction:column;gap:8px;justify-content:center;flex:1 1 150px;min-width:148px}
+  .colhdr{font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin-bottom:-2px}
+  .arrow{flex:0 0 auto;display:flex;align-items:center;color:#b7c0bb;padding:0 9px}
+  .arrow svg{width:17px;height:17px}
+  .node{border:1px solid var(--line);border-radius:10px;padding:8px 11px;background:var(--card)}
+  .node .nt{font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.25;display:flex;align-items:center;gap:6px}
+  .node .nt svg{width:13px;height:13px;flex:none}
+  .node .ns{font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.35}
+  .node.k-entry  {background:#f1efe8;border-color:#d3d1c7}
+  .node.k-action {background:#eef4f1;border-color:#cfe2da}
+  .node.k-ai     {background:#e1f5ee;border-color:#9fe1cb}
+  .node.k-commit {background:#eaf3de;border-color:#c0dd97}
+  .node.k-danger {background:#fcebeb;border-color:#f7c1c1}
+  .node.k-warn   {background:#faeeda;border-color:#fac775}
+  .node code,.finding code{font-family:var(--mono);font-size:11px;background:var(--pill);color:var(--teal-dark);padding:1px 5px;border-radius:5px;word-break:break-word}
+
+  .findings{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 20px 10px}
+  .findings h3{font-size:14px;font-weight:600;margin:14px 0 6px;display:flex;align-items:center;gap:8px}
+  .finding{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:12.5px}
+  .finding:first-of-type{border-top:0}
+  .sev{flex:none;font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;border-radius:5px;padding:3px 8px;height:fit-content;min-width:54px;text-align:center}
+  .sev.bug{background:#fcebeb;color:#a32d2d}
+  .sev.ux{background:#faeeda;color:#854f0b}
+  .sev.copy{background:#eef1f6;color:#3a5a86}
+  .finding .ftext{color:var(--ink);line-height:1.55}
+  .finding .ftext b{font-weight:600}
+
+  footer.foot{max-width:1320px;margin:0 auto;padding:0 28px 50px;color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="mark">T</div>
+  <h1>Tenderfy Business Admin — Visual sitemap</h1>
+  <span class="sub">staging · stgbusinessadmin.tenderfy.org</span>
+</header>
+
+<div class="wrap">
+
+  <div class="howto">
+    <b>To add screenshots:</b> drop a PNG into the <code>shots/</code> folder using the filename shown in each empty slot
+    (e.g. <code>shots/dashboard.png</code>), then refresh this page. Slots fill in automatically; any missing image
+    keeps its placeholder. Tip: Chrome DevTools → <b>Run command</b> → “Capture full size screenshot” gives clean full-page shots.
+  </div>
+
+  <!-- groups injected by script -->
+  <div id="groups"></div>
+
+  <!-- tenders flow deep-dive injected by script -->
+  <div id="deep"></div>
+
+</div>
+
+<footer class="foot">
+  Generated from a full navigation crawl of the staging environment · 21 views across 6 sections,
+  plus Tenders and Responses flow breakdowns with findings. Persistent across all pages: top header
+  (Home · AI Manager · Support · Settings · Notifications · Profile) and the collapsible left sidebar.
+</footer>
+
+<script>
+const BASE = "https://stgbusinessadmin.tenderfy.org";
+const groups = [
+  { title:"Dashboard", lead:"Landing view — KPIs, task panel and upcoming tenders.", pages:[
+    { name:"Dashboard", route:"/dashboard", file:"dashboard", note:"5 KPI cards · My/Assigned/Completed tasks · upcoming tenders" },
+  ]},
+  { title:"Tenders", lead:"Tender pipeline, the per-tender detail/edit workspace, and outcome views. Flow breakdown below.", pages:[
+    { name:"Tenders", route:"/tenders", file:"tenders", note:"All / My Tenders · list & grid · priority filter · folders · Create New Tender" },
+    { name:"Tender Details (edit)", route:"/tenders/tender-details/<id>", file:"tender-details", note:"Per-tender workspace — info · checklist · documentation · notes · Build / Update / Delete", sub:true, noopen:true },
+    { name:"Ray — AI co-pilot", route:"Open Ray (right panel)", file:"tender-ray", note:"RAG chat over selected docs · inline citations · Deep Thinking · Save Prompt", sub:true, noopen:true },
+    { name:"Awarded Tenders", route:"/tenders/awarded-tenders", file:"tenders-awarded", note:"Outcome view — awarded", sub:true },
+    { name:"Unsuccessful Tenders", route:"/tenders/unsuccessful-tenders", file:"tenders-unsuccessful", note:"Outcome view — unsuccessful", sub:true },
+  ]},
+  { title:"Responses", lead:"Reusable Question + Response library (261 records). Flow breakdown below.", pages:[
+    { name:"Responses", route:"/responses", file:"responses", note:"Search · Add / Edit / Delete · Copy · Tags · AI Enhancement · folders" },
+    { name:"AI Responses (folder)", route:"/responses?folderId=ai", file:"responses-ai", note:"System folder — collects AI-generated responses; Add Response hidden", sub:true },
+  ]},
+  { title:"File manager", lead:"Document asset library — one section per document type.", pages:[
+    { name:"Cover Pages", route:"/file-manager/cover-pages", file:"fm-cover-pages", note:"Cover-page files" },
+    { name:"Table of Contents", route:"/file-manager/table-of-contents", file:"fm-toc", note:"ToC files" },
+    { name:"Resumes", route:"/file-manager/resumes", file:"fm-resumes", note:"Skills filter · proficiency / experience sliders" },
+    { name:"Case Studies", route:"/file-manager/case-studies", file:"fm-case-studies", note:"Name · categories · tag" },
+    { name:"Policies", route:"/file-manager/policies", file:"fm-policies", note:"Upload / create policy · folders" },
+    { name:"Insurances", route:"/file-manager/insurances", file:"fm-insurances", note:"Insurer · policy no. · amount · expiry · reminder" },
+    { name:"Certifications", route:"/file-manager/certifications", file:"fm-certifications", note:"Company & Individual subtabs · expiry · reminder" },
+    { name:"Organisation Chart", route:"/file-manager/organization-chart", file:"fm-org-chart", note:"Upload / create org chart" },
+    { name:"Others", route:"/file-manager/others", file:"fm-others", note:"Misc files · upload / create · folders" },
+  ]},
+  { title:"Manage staff", lead:"People and access control.", pages:[
+    { name:"Staff Management", route:"/manage-staff", file:"staff-management", note:"Name · job position · email · user type · role · status" },
+    { name:"Role Management", route:"/manage-staff/role-management", file:"role-management", note:"Role · access", sub:true },
+  ]},
+  { title:"Settings & AI", lead:"Account settings, policies and the AI prompt manager.", pages:[
+    { name:"Settings", route:"/settings", file:"settings", note:"Basic Settings (2FA toggle) · Policies (AI policy doc)" },
+    { name:"AI Manager", route:"/settings/ai-manager", file:"ai-manager", note:"Saved Prompts table · Add Prompt" },
+  ]},
+];
+
+const camIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="4"/></svg>';
+const extIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg>';
+
+const root = document.getElementById("groups");
+for(const g of groups){
+  const sec = document.createElement("section");
+  sec.className = "group";
+  sec.innerHTML = `<h2>${g.title} <span class="count">${g.pages.length}</span></h2><p class="lead">${g.lead}</p>`;
+  const grid = document.createElement("div");
+  grid.className = "grid";
+  for(const p of g.pages){
+    const card = document.createElement("div");
+    card.className = "card";
+    const src = (window.__SHOTS__ && window.__SHOTS__[p.file]) || `shots/${p.file}.png`;
+    card.innerHTML = `
+      <div class="thumb">
+        <img src="${src}" alt="${p.name} screenshot" loading="lazy"
+             onerror="this.classList.add('missing')">
+        <div class="ph">${camIcon}<span class="fn">shots/${p.file}.png</span></div>
+      </div>
+      <div class="meta">
+        <div class="name">${p.name}</div>
+        <div class="route">${p.route}</div>
+        <div class="note">${p.note}</div>
+        <div class="foot">
+          <span class="badge${p.sub?' sub':''}">${p.sub?'subpage':'section'}</span>
+          ${p.noopen
+            ? `<span class="open disabled">in-page view</span>`
+            : `<a class="open" href="${BASE}${p.route}" target="_blank" rel="noopener">Open live ${extIcon}</a>`}
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  }
+  sec.appendChild(grid);
+  root.appendChild(sec);
+}
+
+/* ---- Flow deep-dives, drawn as flow maps ---- */
+const deepDives = [
+  {
+    title:"Tenders — flow map", tag:"create · manage · Ray",
+    lead:"The two paths through Tenders, node by node — what each step opens and where it commits or destroys.",
+    map:[
+      { lane:"Create a tender", stages:[
+        { nodes:[{nt:"Tenders list", k:"entry", ns:"all / my · list · grid · search · filter"}] },
+        { nodes:[{nt:"Create New Tender", k:"action", ns:"modal — Status · Priority · Assignee"}] },
+        { nodes:[{nt:"Tender Info + Documents", k:"action", ns:"Name* · contacts · dates · upload PDF/DOC/…"}] },
+        { nodes:[{nt:"Create Tender", k:"commit", ns:"saves new tender"}] },
+      ]},
+      { lane:"Manage a tender", stages:[
+        { nodes:[{nt:"Open a tender", k:"entry", ns:"click row / card"}] },
+        { nodes:[{nt:"Tender Details", k:"action", ns:"<code>/tenders/tender-details/&lt;id&gt;</code>"}] },
+        { hdr:"workspace", nodes:[
+          {nt:"Tender information", k:"action", ns:"inline-editable fields"},
+          {nt:"Checklist · Add Task", k:"warn", ns:"throws on open (inProgress)"},
+          {nt:"Documentation → Open Ray", k:"ai", ns:"select files · RAG chat + citations"},
+          {nt:"Notes", k:"action", ns:"Add Notes"},
+        ]},
+        { hdr:"commit / remove", nodes:[
+          {nt:"Update Tender", k:"commit", ns:"saves changes"},
+          {nt:"Delete Tender", k:"danger", ns:"confirm has no Cancel"},
+        ]},
+      ]},
+    ],
+    findings:[
+      { sev:"bug", t:"<b>Add Task throws on open.</b> <code>TypeError: Cannot read properties of null (reading 'inProgress')</code> — caught by the global handler and surfaced as a generic “Something went wrong” toast. Tied to time-tracking (Start Time) state; reproduces across accounts." },
+      { sev:"ux", t:"<b>Delete confirm has no labeled Cancel</b> — only the red destructive button + an X, while every other modal here has a Cancel. It also doesn't name the tender and offers no undo." },
+      { sev:"copy", t:"<b>Delete confirm grammar:</b> “Are you sure want to delete this tender?” → “Are you sure you want to delete this tender?”" },
+      { sev:"ux", t:"<b>AI-action naming is inconsistent</b> — “AI Review” in the list/grid kebab vs “Build Tender” / “Open Ray” on the detail page." },
+      { sev:"ux", t:"<b>Bulk file actions are easy to miss</b> — selecting documents reveals Add to Folder / Open Ray in the panel header, far above the file grid." },
+    ],
+  },
+  {
+    title:"Responses — flow map", tag:"create · edit · bulk · folders",
+    lead:"A reusable Question + Response library (261 records). Four sub-flows — create & enhance, edit, bulk, and folders — traced node by node.",
+    map:[
+      { lane:"Create & enhance", stages:[
+        { nodes:[{nt:"Responses list", k:"entry", ns:"search · 261 records · paginated"}] },
+        { nodes:[{nt:"Add Question &amp; Response", k:"action", ns:"Question* · Response* · Tags · Word Count"}] },
+        { nodes:[{nt:"AI Enhancement", k:"ai", ns:"prompt → rewrite the answer"}] },
+        { nodes:[{nt:"Add Response", k:"commit", ns:"saves Q + A"}] },
+      ]},
+      { lane:"Edit / delete", stages:[
+        { nodes:[{nt:"Row · Edit", k:"entry", ns:"expand → body + Word Count · Copy"}] },
+        { nodes:[{nt:"Edit Response", k:"action", ns:"same fields + AI Enhancement"}] },
+        { hdr:"commit / remove", nodes:[
+          {nt:"Save Changes", k:"commit"},
+          {nt:"Delete", k:"danger", ns:"inline · has labeled Cancel"},
+        ]},
+      ]},
+      { lane:"Bulk actions", stages:[
+        { nodes:[{nt:"Select rows", k:"entry", ns:"row checkboxes"}] },
+        { hdr:"header actions", nodes:[
+          {nt:"Delete Selected", k:"danger"},
+          {nt:"Add to Folder", k:"action"},
+        ]},
+      ]},
+      { lane:"Folders", stages:[
+        { nodes:[{nt:"Folders", k:"entry", ns:"+ Add Folder"}] },
+        { hdr:"types", nodes:[
+          {nt:"AI Responses", k:"ai", ns:"system · collects AI answers · Add hidden"},
+          {nt:"Default Responses", k:"action", ns:"system"},
+          {nt:"Custom folder", k:"action", ns:"kebab: Edit / Delete"},
+        ]},
+      ]},
+    ],
+    findings:[
+      { sev:"ux", t:"<b>Delete-pattern inconsistency.</b> The Response edit-delete has a labeled Cancel; the Tender delete dialog doesn't. Pick one destructive-confirm pattern app-wide." },
+      { sev:"ux", t:"<b>Checkbox sits against the expander.</b> The row select box is hard against the expand chevron — easy to mis-hit and toggle the body instead of selecting." },
+      { sev:"data", t:"<b>Apparent duplicates</b> — e.g. “Detailed explanation and proposed alternative:” appears twice on page one. Worth a dedupe/merge pass across the 261 records." },
+    ],
+  },
+];
+
+const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg>';
+const SPARK = '<svg viewBox="0 0 24 24" fill="#0f6e56" aria-hidden="true"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>';
+const WARN  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.8 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>';
+const LEGEND = ['entry:#f1efe8','action:#eef4f1','AI:#e1f5ee','commit:#eaf3de','issue:#faeeda','destructive:#fcebeb']
+  .map(p => { const [l,c] = p.split(':'); return `<span><i style="background:${c}"></i>${l}</span>`; }).join('');
+
+function nodeHtml(n){
+  const ic = n.k === 'ai' ? SPARK : (n.k === 'warn' || n.k === 'danger') ? WARN : '';
+  return `<div class="node k-${n.k}"><div class="nt">${ic}<span>${n.nt}</span></div>${n.ns ? `<div class="ns">${n.ns}</div>` : ''}</div>`;
+}
+
+const deep = document.getElementById("deep");
+for(const dd of deepDives){
+  const sec = document.createElement("section");
+  sec.className = "deep";
+  sec.innerHTML = `<h2>${dd.title} <span class="tag">${dd.tag}</span></h2>
+    <p class="lead">${dd.lead}</p>
+    <div class="maplegend">${LEGEND}</div>`;
+
+  const mapcard = document.createElement("div");
+  mapcard.className = "mapcard";
+  for(const lane of dd.map){
+    let cols = "";
+    lane.stages.forEach((st, i) => {
+      cols += `<div class="col">${st.hdr ? `<div class="colhdr">${st.hdr}</div>` : ""}${st.nodes.map(nodeHtml).join("")}</div>`;
+      if(i < lane.stages.length - 1) cols += `<div class="arrow">${ARROW}</div>`;
+    });
+    mapcard.insertAdjacentHTML("beforeend",
+      `<div class="lane"><div class="lane-label">${lane.lane}</div><div class="pipe">${cols}</div></div>`);
+  }
+  sec.appendChild(mapcard);
+
+  const fbox = document.createElement("div");
+  fbox.className = "findings";
+  fbox.innerHTML = `<h3>Findings &amp; bugs</h3>` + dd.findings.map(f =>
+    `<div class="finding"><span class="sev ${f.sev}">${f.sev}</span><span class="ftext">${f.t}</span></div>`).join("");
+  sec.appendChild(fbox);
+  deep.appendChild(sec);
+}
+</script>
+</body>
+</html>

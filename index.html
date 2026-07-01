@@ -80,17 +80,12 @@
 
   .open.disabled{margin-left:auto;font-size:12.5px;color:var(--muted);opacity:.6}
 
-  .deep{margin-top:46px}
-  .deep > h2{font-size:16px;font-weight:600;margin:0 0 4px;display:flex;align-items:center;gap:9px}
-  .deep > h2 .tag{font-size:11px;font-weight:500;color:#3a5a86;background:#eef1f6;border-radius:20px;padding:2px 10px}
-  .deep > .lead{font-size:13px;color:var(--muted);margin:0 0 18px}
-  /* flow map */
-  .maplegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 18px;font-size:11.5px;color:var(--muted)}
+  /* flow lanes, now rendered as extra rows under a category (not a separate section) */
+  .rows{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:16px}
+  .maplegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:2px 0 18px;font-size:11.5px;color:var(--muted)}
   .maplegend span{display:inline-flex;align-items:center;gap:6px}
   .maplegend i{width:11px;height:11px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.08)}
-  .mapcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px 6px;margin-bottom:14px}
-  .lane{padding:10px 0}
-  .lane + .lane{border-top:1px dashed var(--line)}
+  .lanewrap{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px 10px}
   .lane-label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--teal-dark);margin:0 0 10px}
   .pipe{display:flex;align-items:stretch;overflow-x:auto;padding-bottom:4px}
   .col{display:flex;flex-direction:column;gap:8px;justify-content:center;flex:1 1 150px;min-width:148px}
@@ -109,7 +104,7 @@
   .node.k-warn   {background:#faeeda;border-color:#fac775}
   .node code,.finding code{font-family:var(--mono);font-size:11px;background:var(--pill);color:var(--teal-dark);padding:1px 5px;border-radius:5px;word-break:break-word}
 
-  .findings{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 20px 10px}
+  .findings{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 20px 10px}
   .findings h3{font-size:14px;font-weight:600;margin:14px 0 6px;display:flex;align-items:center;gap:8px}
   .finding{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:12.5px}
   .finding:first-of-type{border-top:0}
@@ -147,18 +142,16 @@
     keeps its placeholder. Tip: Chrome DevTools → <b>Run command</b> → “Capture full size screenshot” gives clean full-page shots.
   </div>
 
-  <!-- groups injected by script -->
+  <!-- whole sitemap (tree + flow lanes) injected by script -->
   <div id="groups"></div>
-
-  <!-- tenders flow deep-dive injected by script -->
-  <div id="deep"></div>
 
 </div>
 
 <footer class="foot">
   Generated from a full navigation crawl of the staging environment · 21 views across 6 sections,
-  plus Tenders and Responses flow breakdowns with findings. Persistent across all pages: top header
-  (Home · AI Manager · Support · Settings · Notifications · Profile) and the collapsible left sidebar.
+  with Tenders and Responses branching further into their create/edit/delete flow maps and findings.
+  Persistent across all pages: top header (Home · AI Manager · Support · Settings · Notifications · Profile)
+  and the collapsible left sidebar.
 </footer>
 
 <script>
@@ -167,16 +160,77 @@ const groups = [
   { title:"Dashboard", lead:"Landing view — KPIs, task panel and upcoming tenders.", pages:[
     { name:"Dashboard", route:"/dashboard", file:"dashboard", note:"5 KPI cards · My/Assigned/Completed tasks · upcoming tenders" },
   ]},
-  { title:"Tenders", lead:"Tender pipeline, the per-tender detail/edit workspace, and outcome views. Flow breakdown below.", pages:[
+  { title:"Tenders", lead:"Tender pipeline, the per-tender detail/edit workspace, and outcome views.", pages:[
     { name:"Tenders", route:"/tenders", file:"tenders", note:"All / My Tenders · list & grid · priority filter · folders · Create New Tender" },
     { name:"Tender Details (edit)", route:"/tenders/tender-details/<id>", file:"tender-details", note:"Per-tender workspace — info · checklist · documentation · notes · Build / Update / Delete", sub:true, noopen:true },
     { name:"Ray — AI co-pilot", route:"Open Ray (right panel)", file:"tender-ray", note:"RAG chat over selected docs · inline citations · Deep Thinking · Save Prompt", sub:true, noopen:true },
     { name:"Awarded Tenders", route:"/tenders/awarded-tenders", file:"tenders-awarded", note:"Outcome view — awarded", sub:true },
     { name:"Unsuccessful Tenders", route:"/tenders/unsuccessful-tenders", file:"tenders-unsuccessful", note:"Outcome view — unsuccessful", sub:true },
+  ], flows:[
+    { lane:"Create a tender", stages:[
+      { nodes:[{nt:"Tenders list", k:"entry", ns:"all / my · list · grid · search · filter"}] },
+      { nodes:[{nt:"Create New Tender", k:"action", ns:"modal — Status · Priority · Assignee"}] },
+      { nodes:[{nt:"Tender Info + Documents", k:"action", ns:"Name* · contacts · dates · upload PDF/DOC/…"}] },
+      { nodes:[{nt:"Create Tender", k:"commit", ns:"saves new tender"}] },
+    ]},
+    { lane:"Manage a tender", stages:[
+      { nodes:[{nt:"Open a tender", k:"entry", ns:"click row / card"}] },
+      { nodes:[{nt:"Tender Details", k:"action", ns:"<code>/tenders/tender-details/&lt;id&gt;</code>"}] },
+      { hdr:"workspace", nodes:[
+        {nt:"Tender information", k:"action", ns:"inline-editable fields"},
+        {nt:"Checklist · Add Task", k:"warn", ns:"throws on open (inProgress)"},
+        {nt:"Documentation → Open Ray", k:"ai", ns:"select files · RAG chat + citations"},
+        {nt:"Notes", k:"action", ns:"Add Notes"},
+      ]},
+      { hdr:"commit / remove", nodes:[
+        {nt:"Update Tender", k:"commit", ns:"saves changes"},
+        {nt:"Delete Tender", k:"danger", ns:"confirm has no Cancel"},
+      ]},
+    ]},
+  ], findings:[
+    { sev:"bug", t:"<b>Add Task throws on open.</b> <code>TypeError: Cannot read properties of null (reading 'inProgress')</code> — caught by the global handler and surfaced as a generic “Something went wrong” toast. Tied to time-tracking (Start Time) state; reproduces across accounts." },
+    { sev:"ux", t:"<b>Delete confirm has no labeled Cancel</b> — only the red destructive button + an X, while every other modal here has a Cancel. It also doesn't name the tender and offers no undo." },
+    { sev:"copy", t:"<b>Delete confirm grammar:</b> “Are you sure want to delete this tender?” → “Are you sure you want to delete this tender?”" },
+    { sev:"ux", t:"<b>AI-action naming is inconsistent</b> — “AI Review” in the list/grid kebab vs “Build Tender” / “Open Ray” on the detail page." },
+    { sev:"ux", t:"<b>Bulk file actions are easy to miss</b> — selecting documents reveals Add to Folder / Open Ray in the panel header, far above the file grid." },
   ]},
-  { title:"Responses", lead:"Reusable Question + Response library (261 records). Flow breakdown below.", pages:[
+  { title:"Responses", lead:"Reusable Question + Response library (261 records).", pages:[
     { name:"Responses", route:"/responses", file:"responses", note:"Search · Add / Edit / Delete · Copy · Tags · AI Enhancement · folders" },
     { name:"AI Responses (folder)", route:"/responses?folderId=ai", file:"responses-ai", note:"System folder — collects AI-generated responses; Add Response hidden", sub:true },
+  ], flows:[
+    { lane:"Create & enhance", stages:[
+      { nodes:[{nt:"Responses list", k:"entry", ns:"search · 261 records · paginated"}] },
+      { nodes:[{nt:"Add Question &amp; Response", k:"action", ns:"Question* · Response* · Tags · Word Count"}] },
+      { nodes:[{nt:"AI Enhancement", k:"ai", ns:"prompt → rewrite the answer"}] },
+      { nodes:[{nt:"Add Response", k:"commit", ns:"saves Q + A"}] },
+    ]},
+    { lane:"Edit / delete", stages:[
+      { nodes:[{nt:"Row · Edit", k:"entry", ns:"expand → body + Word Count · Copy"}] },
+      { nodes:[{nt:"Edit Response", k:"action", ns:"same fields + AI Enhancement"}] },
+      { hdr:"commit / remove", nodes:[
+        {nt:"Save Changes", k:"commit"},
+        {nt:"Delete", k:"danger", ns:"inline · has labeled Cancel"},
+      ]},
+    ]},
+    { lane:"Bulk actions", stages:[
+      { nodes:[{nt:"Select rows", k:"entry", ns:"row checkboxes"}] },
+      { hdr:"header actions", nodes:[
+        {nt:"Delete Selected", k:"danger"},
+        {nt:"Add to Folder", k:"action"},
+      ]},
+    ]},
+    { lane:"Folders", stages:[
+      { nodes:[{nt:"Folders", k:"entry", ns:"+ Add Folder"}] },
+      { hdr:"types", nodes:[
+        {nt:"AI Responses", k:"ai", ns:"system · collects AI answers · Add hidden"},
+        {nt:"Default Responses", k:"action", ns:"system"},
+        {nt:"Custom folder", k:"action", ns:"kebab: Edit / Delete"},
+      ]},
+    ]},
+  ], findings:[
+    { sev:"ux", t:"<b>Delete-pattern inconsistency.</b> The Response edit-delete has a labeled Cancel; the Tender delete dialog doesn't. Pick one destructive-confirm pattern app-wide." },
+    { sev:"ux", t:"<b>Checkbox sits against the expander.</b> The row select box is hard against the expand chevron — easy to mis-hit and toggle the body instead of selecting." },
+    { sev:"data", t:"<b>Apparent duplicates</b> — e.g. “Detailed explanation and proposed alternative:” appears twice on page one. Worth a dedupe/merge pass across the 261 records." },
   ]},
   { title:"File manager", lead:"Document asset library — one section per document type.", pages:[
     { name:"Cover Pages", route:"/file-manager/cover-pages", file:"fm-cover-pages", note:"Cover-page files" },
@@ -201,9 +255,21 @@ const groups = [
 
 const camIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="4"/></svg>';
 const extIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg>';
+const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg>';
+const SPARK = '<svg viewBox="0 0 24 24" fill="#0f6e56" aria-hidden="true"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>';
+const WARN  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.8 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>';
+const LEGEND = ['entry:#f1efe8','action:#eef4f1','AI:#e1f5ee','commit:#eaf3de','issue:#faeeda','destructive:#fcebeb']
+  .map(p => { const [l,c] = p.split(':'); return `<span><i style="background:${c}"></i>${l}</span>`; }).join('');
 
-// ---- render the navigation as a left-to-right tree map -----------------------
+function nodeHtml(n){
+  const ic = n.k === 'ai' ? SPARK : (n.k === 'warn' || n.k === 'danger') ? WARN : '';
+  return `<div class="node k-${n.k}"><div class="nt">${ic}<span>${n.nt}</span></div>${n.ns ? `<div class="ns">${n.ns}</div>` : ''}</div>`;
+}
+
+// ---- render the whole thing as ONE tree: root -> category -> (page leaves + flow lanes) ----
 const root = document.getElementById("groups");
+root.insertAdjacentHTML("beforeend", `<div class="maplegend">${LEGEND}</div>`);
+
 const sm = document.createElement("div");
 sm.className = "sitemap"; sm.id = "sm";
 sm.innerHTML = `<svg class="sm-lines"></svg>
@@ -218,23 +284,51 @@ for(const g of groups){
   const br = document.createElement("div");
   br.className = "branch";
   br.innerHTML = `<div class="cat"><span class="cn">${g.title}</span><span class="cc">${g.pages.length}</span></div>`;
-  const leaves = document.createElement("div");
-  leaves.className = "leaves";
-  for(const p of g.pages){
-    const src = (window.__SHOTS__ && window.__SHOTS__[p.file]) || `shots/${p.file}.png`;
-    const leaf = document.createElement("div");
-    leaf.className = "leaf" + (p.sub ? " sub" : "");
-    leaf.title = p.note || "";
-    leaf.innerHTML = `
-      <div class="lthumb"><img src="${src}" alt="${p.name}" loading="lazy" onerror="this.classList.add('missing')"><div class="ph">${camIcon}</div></div>
-      <div class="lmeta">
-        <div class="ln">${p.name}${p.noopen ? "" : `<a class="ext" href="${BASE}${p.route}" target="_blank" rel="noopener" title="Open live" onclick="event.stopPropagation()">${extIcon}</a>`}</div>
-        <div class="lr">${p.route}</div>
-      </div>`;
-    leaf.addEventListener("click", () => openLB(src, p.name + "  ·  " + p.route));
-    leaves.appendChild(leaf);
+
+  const rows = document.createElement("div");
+  rows.className = "rows";
+
+  if(g.pages.length){
+    const leaves = document.createElement("div");
+    leaves.className = "leaves";
+    for(const p of g.pages){
+      const src = (window.__SHOTS__ && window.__SHOTS__[p.file]) || `shots/${p.file}.png`;
+      const leaf = document.createElement("div");
+      leaf.className = "leaf" + (p.sub ? " sub" : "");
+      leaf.title = p.note || "";
+      leaf.innerHTML = `
+        <div class="lthumb"><img src="${src}" alt="${p.name}" loading="lazy" onerror="this.classList.add('missing')"><div class="ph">${camIcon}</div></div>
+        <div class="lmeta">
+          <div class="ln">${p.name}${p.noopen ? "" : `<a class="ext" href="${BASE}${p.route}" target="_blank" rel="noopener" title="Open live" onclick="event.stopPropagation()">${extIcon}</a>`}</div>
+          <div class="lr">${p.route}</div>
+        </div>`;
+      leaf.addEventListener("click", () => openLB(src, p.name + "  ·  " + p.route));
+      leaves.appendChild(leaf);
+    }
+    rows.appendChild(leaves);
   }
-  br.appendChild(leaves);
+
+  if(g.flows){
+    for(const lane of g.flows){
+      let cols = "";
+      lane.stages.forEach((st, i) => {
+        cols += `<div class="col">${st.hdr ? `<div class="colhdr">${st.hdr}</div>` : ""}${st.nodes.map(nodeHtml).join("")}</div>`;
+        if(i < lane.stages.length - 1) cols += `<div class="arrow">${ARROW}</div>`;
+      });
+      rows.insertAdjacentHTML("beforeend",
+        `<div class="lanewrap"><div class="lane-label">${lane.lane}</div><div class="pipe">${cols}</div></div>`);
+    }
+  }
+
+  if(g.findings){
+    const fbox = document.createElement("div");
+    fbox.className = "findings";
+    fbox.innerHTML = `<h3>Findings &amp; bugs</h3>` + g.findings.map(f =>
+      `<div class="finding"><span class="sev ${f.sev}">${f.sev}</span><span class="ftext">${f.t}</span></div>`).join("");
+    rows.appendChild(fbox);
+  }
+
+  br.appendChild(rows);
   branches.appendChild(br);
 }
 sm.appendChild(branches);
@@ -253,7 +347,7 @@ function openLB(src, cap){
   lb.hidden = false;
 }
 
-// draw the connector lines (root -> categories, category -> its leaves)
+// draw the connector lines (root -> categories, category -> its page leaves AND its flow lanes)
 const svg = sm.querySelector(".sm-lines");
 function pos(el){
   const r = el.getBoundingClientRect(), s = sm.getBoundingClientRect();
@@ -272,130 +366,13 @@ function drawLines(){
   for(const cat of sm.querySelectorAll(".cat")) d += elbow(rp, pos(cat)) + " ";
   for(const b of sm.querySelectorAll(".branch")){
     const cp = pos(b.querySelector(".cat"));
-    for(const lf of b.querySelectorAll(".leaf")) d += elbow(cp, pos(lf)) + " ";
+    for(const item of b.querySelectorAll(".leaf, .lanewrap")) d += elbow(cp, pos(item)) + " ";
   }
   svg.innerHTML = `<path d="${d.trim()}"/>`;
 }
 requestAnimationFrame(drawLines);
 window.addEventListener("load", drawLines);
 window.addEventListener("resize", drawLines);
-
-/* ---- Flow deep-dives, drawn as flow maps ---- */
-const deepDives = [
-  {
-    title:"Tenders — flow map", tag:"create · manage · Ray",
-    lead:"The two paths through Tenders, node by node — what each step opens and where it commits or destroys.",
-    map:[
-      { lane:"Create a tender", stages:[
-        { nodes:[{nt:"Tenders list", k:"entry", ns:"all / my · list · grid · search · filter"}] },
-        { nodes:[{nt:"Create New Tender", k:"action", ns:"modal — Status · Priority · Assignee"}] },
-        { nodes:[{nt:"Tender Info + Documents", k:"action", ns:"Name* · contacts · dates · upload PDF/DOC/…"}] },
-        { nodes:[{nt:"Create Tender", k:"commit", ns:"saves new tender"}] },
-      ]},
-      { lane:"Manage a tender", stages:[
-        { nodes:[{nt:"Open a tender", k:"entry", ns:"click row / card"}] },
-        { nodes:[{nt:"Tender Details", k:"action", ns:"<code>/tenders/tender-details/&lt;id&gt;</code>"}] },
-        { hdr:"workspace", nodes:[
-          {nt:"Tender information", k:"action", ns:"inline-editable fields"},
-          {nt:"Checklist · Add Task", k:"warn", ns:"throws on open (inProgress)"},
-          {nt:"Documentation → Open Ray", k:"ai", ns:"select files · RAG chat + citations"},
-          {nt:"Notes", k:"action", ns:"Add Notes"},
-        ]},
-        { hdr:"commit / remove", nodes:[
-          {nt:"Update Tender", k:"commit", ns:"saves changes"},
-          {nt:"Delete Tender", k:"danger", ns:"confirm has no Cancel"},
-        ]},
-      ]},
-    ],
-    findings:[
-      { sev:"bug", t:"<b>Add Task throws on open.</b> <code>TypeError: Cannot read properties of null (reading 'inProgress')</code> — caught by the global handler and surfaced as a generic “Something went wrong” toast. Tied to time-tracking (Start Time) state; reproduces across accounts." },
-      { sev:"ux", t:"<b>Delete confirm has no labeled Cancel</b> — only the red destructive button + an X, while every other modal here has a Cancel. It also doesn't name the tender and offers no undo." },
-      { sev:"copy", t:"<b>Delete confirm grammar:</b> “Are you sure want to delete this tender?” → “Are you sure you want to delete this tender?”" },
-      { sev:"ux", t:"<b>AI-action naming is inconsistent</b> — “AI Review” in the list/grid kebab vs “Build Tender” / “Open Ray” on the detail page." },
-      { sev:"ux", t:"<b>Bulk file actions are easy to miss</b> — selecting documents reveals Add to Folder / Open Ray in the panel header, far above the file grid." },
-    ],
-  },
-  {
-    title:"Responses — flow map", tag:"create · edit · bulk · folders",
-    lead:"A reusable Question + Response library (261 records). Four sub-flows — create & enhance, edit, bulk, and folders — traced node by node.",
-    map:[
-      { lane:"Create & enhance", stages:[
-        { nodes:[{nt:"Responses list", k:"entry", ns:"search · 261 records · paginated"}] },
-        { nodes:[{nt:"Add Question &amp; Response", k:"action", ns:"Question* · Response* · Tags · Word Count"}] },
-        { nodes:[{nt:"AI Enhancement", k:"ai", ns:"prompt → rewrite the answer"}] },
-        { nodes:[{nt:"Add Response", k:"commit", ns:"saves Q + A"}] },
-      ]},
-      { lane:"Edit / delete", stages:[
-        { nodes:[{nt:"Row · Edit", k:"entry", ns:"expand → body + Word Count · Copy"}] },
-        { nodes:[{nt:"Edit Response", k:"action", ns:"same fields + AI Enhancement"}] },
-        { hdr:"commit / remove", nodes:[
-          {nt:"Save Changes", k:"commit"},
-          {nt:"Delete", k:"danger", ns:"inline · has labeled Cancel"},
-        ]},
-      ]},
-      { lane:"Bulk actions", stages:[
-        { nodes:[{nt:"Select rows", k:"entry", ns:"row checkboxes"}] },
-        { hdr:"header actions", nodes:[
-          {nt:"Delete Selected", k:"danger"},
-          {nt:"Add to Folder", k:"action"},
-        ]},
-      ]},
-      { lane:"Folders", stages:[
-        { nodes:[{nt:"Folders", k:"entry", ns:"+ Add Folder"}] },
-        { hdr:"types", nodes:[
-          {nt:"AI Responses", k:"ai", ns:"system · collects AI answers · Add hidden"},
-          {nt:"Default Responses", k:"action", ns:"system"},
-          {nt:"Custom folder", k:"action", ns:"kebab: Edit / Delete"},
-        ]},
-      ]},
-    ],
-    findings:[
-      { sev:"ux", t:"<b>Delete-pattern inconsistency.</b> The Response edit-delete has a labeled Cancel; the Tender delete dialog doesn't. Pick one destructive-confirm pattern app-wide." },
-      { sev:"ux", t:"<b>Checkbox sits against the expander.</b> The row select box is hard against the expand chevron — easy to mis-hit and toggle the body instead of selecting." },
-      { sev:"data", t:"<b>Apparent duplicates</b> — e.g. “Detailed explanation and proposed alternative:” appears twice on page one. Worth a dedupe/merge pass across the 261 records." },
-    ],
-  },
-];
-
-const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg>';
-const SPARK = '<svg viewBox="0 0 24 24" fill="#0f6e56" aria-hidden="true"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>';
-const WARN  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.8 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>';
-const LEGEND = ['entry:#f1efe8','action:#eef4f1','AI:#e1f5ee','commit:#eaf3de','issue:#faeeda','destructive:#fcebeb']
-  .map(p => { const [l,c] = p.split(':'); return `<span><i style="background:${c}"></i>${l}</span>`; }).join('');
-
-function nodeHtml(n){
-  const ic = n.k === 'ai' ? SPARK : (n.k === 'warn' || n.k === 'danger') ? WARN : '';
-  return `<div class="node k-${n.k}"><div class="nt">${ic}<span>${n.nt}</span></div>${n.ns ? `<div class="ns">${n.ns}</div>` : ''}</div>`;
-}
-
-const deep = document.getElementById("deep");
-for(const dd of deepDives){
-  const sec = document.createElement("section");
-  sec.className = "deep";
-  sec.innerHTML = `<h2>${dd.title} <span class="tag">${dd.tag}</span></h2>
-    <p class="lead">${dd.lead}</p>
-    <div class="maplegend">${LEGEND}</div>`;
-
-  const mapcard = document.createElement("div");
-  mapcard.className = "mapcard";
-  for(const lane of dd.map){
-    let cols = "";
-    lane.stages.forEach((st, i) => {
-      cols += `<div class="col">${st.hdr ? `<div class="colhdr">${st.hdr}</div>` : ""}${st.nodes.map(nodeHtml).join("")}</div>`;
-      if(i < lane.stages.length - 1) cols += `<div class="arrow">${ARROW}</div>`;
-    });
-    mapcard.insertAdjacentHTML("beforeend",
-      `<div class="lane"><div class="lane-label">${lane.lane}</div><div class="pipe">${cols}</div></div>`);
-  }
-  sec.appendChild(mapcard);
-
-  const fbox = document.createElement("div");
-  fbox.className = "findings";
-  fbox.innerHTML = `<h3>Findings &amp; bugs</h3>` + dd.findings.map(f =>
-    `<div class="finding"><span class="sev ${f.sev}">${f.sev}</span><span class="ftext">${f.t}</span></div>`).join("");
-  sec.appendChild(fbox);
-  deep.appendChild(sec);
-}
 </script>
 </body>
 </html>

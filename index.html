@@ -127,14 +127,44 @@
 
   .findings{background:var(--card);border:1px solid var(--line);border-radius:var(--card-r);padding:14px 18px 12px}
   .findings h3{font-size:14px;font-weight:600;margin:0 0 10px;display:flex;align-items:center;gap:8px}
-  .finding{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:12.5px}
+  .finding{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line);font-size:12.5px}
   .finding:first-of-type{border-top:0}
   .sev{flex:none;font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;border-radius:5px;padding:3px 8px;height:fit-content;min-width:54px;text-align:center}
   .sev.bug{background:#fcebeb;color:#a32d2d}
   .sev.ux{background:#faeeda;color:#854f0b}
   .sev.copy{background:#eef1f6;color:#3a5a86}
-  .finding .ftext{color:var(--ink);line-height:1.55}
+  .sev.data{background:#eef1f6;color:#3a5a86}
+  .finding .ftext{color:var(--ink);line-height:1.55;flex:1 1 auto;min-width:0}
   .finding .ftext b{font-weight:600}
+  .fthumb{flex:0 0 108px;height:68px;border-radius:8px;overflow:hidden;position:relative;background:#eef1ee;cursor:zoom-in}
+  .fthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+  .fthumb img.missing{display:none}
+  .fthumb .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#aab2ac}
+  .fthumb .ph svg{width:18px;height:18px;opacity:.6}
+  .fthumb img:not(.missing) + .ph{display:none}
+
+  /* tabs */
+  .tabbar{display:flex;gap:22px;border-bottom:1px solid var(--line);margin-bottom:24px}
+  .tab{appearance:none;background:none;border:none;border-bottom:2px solid transparent;padding:4px 2px 12px;
+    font:inherit;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:7px}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--teal-dark);border-bottom-color:var(--teal-dark);font-weight:600}
+  .tabtag{font-size:10px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:#854f0b;
+    background:var(--k-warn-bg);border:1px solid var(--k-warn-bd);border-radius:20px;padding:1px 8px}
+  .tabpanel[hidden]{display:none}
+
+  /* Findings & Bugs tab */
+  .fgroup{margin-bottom:26px}
+  .fgroup:last-child{margin-bottom:0}
+  .fgrouptitle{font-size:13px;font-weight:600;color:var(--teal-dark);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .fgrouptitle .cc{font-size:11px;font-weight:500;color:#fff;background:var(--teal);border-radius:20px;padding:1px 8px}
+
+  /* More Flows (sample) tab */
+  .comingsoon{background:var(--card);border:1px dashed var(--line);border-radius:var(--card-r);padding:18px 22px}
+  .comingsoon h3{font-size:15px;font-weight:600;margin:0 0 8px;display:flex;align-items:center;gap:9px}
+  .comingsoon p{font-size:13px;color:var(--muted);margin:0 0 12px;line-height:1.6}
+  .comingsoon ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+  .comingsoon li{font-size:13px;color:var(--ink);line-height:1.5}
 
   footer.foot{max-width:1320px;margin:0 auto;padding:0 28px 50px;color:var(--muted);font-size:12.5px}
 </style>
@@ -163,14 +193,25 @@
     keeps its placeholder. Tip: Chrome DevTools → <b>Run command</b> → “Capture full size screenshot” gives clean full-page shots.
   </div>
 
-  <!-- whole sitemap (tree + flow lanes) injected by script -->
-  <div id="groups"></div>
+  <div class="tabbar" role="tablist">
+    <button class="tab active" role="tab" aria-selected="true" data-tab="sitemap">Sitemap</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="findings">Findings &amp; Bugs</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="more">More Flows <span class="tabtag">sample</span></button>
+  </div>
+
+  <!-- tree + flow lanes injected by script -->
+  <div class="tabpanel" id="panel-sitemap" role="tabpanel"></div>
+  <!-- consolidated findings, injected by script -->
+  <div class="tabpanel" id="panel-findings" role="tabpanel" hidden></div>
+  <!-- placeholder for not-yet-mapped sections, injected by script -->
+  <div class="tabpanel" id="panel-more" role="tabpanel" hidden></div>
 
 </div>
 
 <footer class="foot">
   Generated from a full navigation crawl of the staging environment · 22 views across 6 sections,
-  with Tenders (including Build Tender) and Responses branching further into their flow maps and findings.
+  with Tenders (including Build Tender) and Responses branching further into their flow maps.
+  Findings & bugs consolidated in their own tab; More Flows is a placeholder for sections not yet mapped.
   Persistent across all pages: top header (Home · AI Manager · Support · Settings · Notifications · Profile)
   and the collapsible left sidebar.
 </footer>
@@ -223,51 +264,51 @@ const groups = [
       ]},
     ]},
   ], findings:[
-    { sev:"bug", t:"<b>Add Task throws on open.</b> <code>TypeError: Cannot read properties of null (reading 'inProgress')</code> — caught by the global handler and surfaced as a generic “Something went wrong” toast. Tied to time-tracking (Start Time) state; reproduces across accounts." },
-    { sev:"ux", t:"<b>Delete confirm has no labeled Cancel</b> — only the red destructive button + an X, while every other modal here has a Cancel. It also doesn't name the tender and offers no undo." },
-    { sev:"copy", t:"<b>Delete confirm grammar:</b> “Are you sure want to delete this tender?” → “Are you sure you want to delete this tender?”" },
-    { sev:"ux", t:"<b>AI-action naming is inconsistent</b> — “AI Review” in the list/grid kebab vs “Build Tender” / “Open Ray” on the detail page." },
-    { sev:"ux", t:"<b>Bulk file actions are easy to miss</b> — selecting documents reveals Add to Folder / Open Ray in the panel header, far above the file grid." },
-    { sev:"ux", t:"<b>Build Tender's Add/Remove persist immediately</b> — no confirmation, no “unsaved changes” state — while a prominent <b>Save Changes</b> button sits right next to them implying otherwise." },
-    { sev:"ux", t:"<b>Two unrelated “add” controls per category</b> in Build Tender — a small icon opens a generic template/divider picker, “+ Add X” opens the real document library — with nothing visually distinguishing them." },
+    { sev:"bug", t:"<b>Add Task throws on open.</b> <code>TypeError: Cannot read properties of null (reading 'inProgress')</code> — caught by the global handler and surfaced as a generic “Something went wrong” toast. Tied to time-tracking (Start Time) state; reproduces across accounts.", shot:"modal-add-task" },
+    { sev:"ux", t:"<b>Delete confirm has no labeled Cancel</b> — only the red destructive button + an X, while every other modal here has a Cancel. It also doesn't name the tender and offers no undo.", shot:"modal-delete-tender" },
+    { sev:"copy", t:"<b>Delete confirm grammar:</b> “Are you sure want to delete this tender?” → “Are you sure you want to delete this tender?”", shot:"modal-delete-tender" },
+    { sev:"ux", t:"<b>AI-action naming is inconsistent</b> — “AI Review” in the list/grid kebab vs “Build Tender” / “Open Ray” on the detail page.", shot:"tenders" },
+    { sev:"ux", t:"<b>Bulk file actions are easy to miss</b> — selecting documents reveals Add to Folder / Open Ray in the panel header, far above the file grid.", shot:"tender-details" },
+    { sev:"ux", t:"<b>Build Tender's Add/Remove persist immediately</b> — no confirmation, no “unsaved changes” state — while a prominent <b>Save Changes</b> button sits right next to them implying otherwise.", shot:"tender-build" },
+    { sev:"ux", t:"<b>Two unrelated “add” controls per category</b> in Build Tender — a small icon opens a generic template/divider picker, “+ Add X” opens the real document library — with nothing visually distinguishing them.", shot:"modal-add-category" },
   ]},
   { title:"Responses", lead:"Reusable Question + Response library (261 records).", pages:[
     { name:"Responses", route:"/responses", file:"responses", note:"Search · Add / Edit / Delete · Copy · Tags · AI Enhancement · folders" },
     { name:"AI Responses (folder)", route:"/responses?folderId=ai", file:"responses-ai", note:"System folder — collects AI-generated responses; Add Response hidden", sub:true },
   ], flows:[
     { lane:"Create & enhance", stages:[
-      { nodes:[{nt:"Responses list", k:"entry", ns:"search · 261 records · paginated"}] },
-      { nodes:[{nt:"Add Question &amp; Response", k:"action", ns:"Question* · Response* · Tags · Word Count"}] },
-      { nodes:[{nt:"AI Enhancement", k:"ai", ns:"prompt → rewrite the answer"}] },
-      { nodes:[{nt:"Add Response", k:"commit", ns:"saves Q + A"}] },
+      { nodes:[{nt:"Responses list", k:"entry", ns:"search · 261 records · paginated", shot:"responses"}] },
+      { nodes:[{nt:"Add Question &amp; Response", k:"action", ns:"Question* · Response* · Tags · Word Count", shot:"modal-add-response"}] },
+      { nodes:[{nt:"AI Enhancement", k:"ai", ns:"prompt → rewrite the answer", shot:"modal-ai-enhancement"}] },
+      { nodes:[{nt:"Add Response", k:"commit", ns:"saves Q + A", shot:"modal-add-response"}] },
     ]},
     { lane:"Edit / delete", stages:[
-      { nodes:[{nt:"Row · Edit", k:"entry", ns:"expand → body + Word Count · Copy"}] },
-      { nodes:[{nt:"Edit Response", k:"action", ns:"same fields + AI Enhancement"}] },
+      { nodes:[{nt:"Row · Edit", k:"entry", ns:"expand → body + Word Count · Copy", shot:"responses"}] },
+      { nodes:[{nt:"Edit Response", k:"action", ns:"same fields + AI Enhancement", shot:"modal-edit-response"}] },
       { hdr:"commit / remove", nodes:[
-        {nt:"Save Changes", k:"commit"},
-        {nt:"Delete", k:"danger", ns:"inline · has labeled Cancel"},
+        {nt:"Save Changes", k:"commit", shot:"modal-edit-response"},
+        {nt:"Delete", k:"danger", ns:"inline · has labeled Cancel", shot:"modal-edit-response"},
       ]},
     ]},
     { lane:"Bulk actions", stages:[
-      { nodes:[{nt:"Select rows", k:"entry", ns:"row checkboxes"}] },
+      { nodes:[{nt:"Select rows", k:"entry", ns:"row checkboxes", shot:"responses-bulk"}] },
       { hdr:"header actions", nodes:[
-        {nt:"Delete Selected", k:"danger"},
-        {nt:"Add to Folder", k:"action"},
+        {nt:"Delete Selected", k:"danger", shot:"responses-bulk"},
+        {nt:"Add to Folder", k:"action", shot:"responses-bulk"},
       ]},
     ]},
     { lane:"Folders", stages:[
-      { nodes:[{nt:"Folders", k:"entry", ns:"+ Add Folder"}] },
+      { nodes:[{nt:"Folders", k:"entry", ns:"+ Add Folder", shot:"responses"}] },
       { hdr:"types", nodes:[
-        {nt:"AI Responses", k:"ai", ns:"system · collects AI answers · Add hidden"},
-        {nt:"Default Responses", k:"action", ns:"system"},
-        {nt:"Custom folder", k:"action", ns:"kebab: Edit / Delete"},
+        {nt:"AI Responses", k:"ai", ns:"system · collects AI answers · Add hidden", shot:"responses-ai"},
+        {nt:"Default Responses", k:"action", ns:"system", shot:"responses"},
+        {nt:"Custom folder", k:"action", ns:"kebab: Edit / Delete", shot:"responses"},
       ]},
     ]},
   ], findings:[
-    { sev:"ux", t:"<b>Delete-pattern inconsistency.</b> The Response edit-delete has a labeled Cancel; the Tender delete dialog doesn't. Pick one destructive-confirm pattern app-wide." },
-    { sev:"ux", t:"<b>Checkbox sits against the expander.</b> The row select box is hard against the expand chevron — easy to mis-hit and toggle the body instead of selecting." },
-    { sev:"data", t:"<b>Apparent duplicates</b> — e.g. “Detailed explanation and proposed alternative:” appears twice on page one. Worth a dedupe/merge pass across the 261 records." },
+    { sev:"ux", t:"<b>Delete-pattern inconsistency.</b> The Response edit-delete has a labeled Cancel; the Tender delete dialog doesn't. Pick one destructive-confirm pattern app-wide.", shot:"modal-edit-response" },
+    { sev:"ux", t:"<b>Checkbox sits against the expander.</b> The row select box is hard against the expand chevron — easy to mis-hit and toggle the body instead of selecting.", shot:"responses" },
+    { sev:"data", t:"<b>Apparent duplicates</b> — e.g. “Detailed explanation and proposed alternative:” appears twice on page one. Worth a dedupe/merge pass across the 261 records.", shot:"responses" },
   ]},
   { title:"File manager", lead:"Document asset library — one section per document type.", pages:[
     { name:"Cover Pages", route:"/file-manager/cover-pages", file:"fm-cover-pages", note:"Cover-page files" },
@@ -306,8 +347,8 @@ function nodeHtml(n){
   return `<div class="node k-${n.k}">${thumb}<div class="nt">${ic}<span>${n.nt}</span></div>${n.ns ? `<div class="ns">${n.ns}</div>` : ''}</div>`;
 }
 
-// ---- render the whole thing as ONE tree: root -> category -> (page leaves + flow lanes) ----
-const root = document.getElementById("groups");
+// ---- render the whole tree (leaves + flow lanes) into the Sitemap tab ----
+const root = document.getElementById("panel-sitemap");
 root.insertAdjacentHTML("beforeend", `<div class="maplegend">${LEGEND}</div>`);
 
 const sm = document.createElement("div");
@@ -358,14 +399,6 @@ for(const g of groups){
       rows.insertAdjacentHTML("beforeend",
         `<div class="lanewrap"><div class="lane-label">${lane.lane}</div><div class="pipe">${cols}</div></div>`);
     }
-  }
-
-  if(g.findings){
-    const fbox = document.createElement("div");
-    fbox.className = "findings";
-    fbox.innerHTML = `<h3>Findings &amp; bugs</h3>` + g.findings.map(f =>
-      `<div class="finding"><span class="sev ${f.sev}">${f.sev}</span><span class="ftext">${f.t}</span></div>`).join("");
-    rows.appendChild(fbox);
   }
 
   br.appendChild(rows);
@@ -422,6 +455,53 @@ function drawLines(){
 requestAnimationFrame(drawLines);
 window.addEventListener("load", drawLines);
 window.addEventListener("resize", drawLines);
+
+// ---- Findings & Bugs tab: every finding from every group, each referencing its screenshot ----
+const findingsPanel = document.getElementById("panel-findings");
+findingsPanel.innerHTML = groups.filter(g => g.findings && g.findings.length).map(g => `
+  <div class="fgroup">
+    <div class="fgrouptitle">${g.title} <span class="cc">${g.findings.length}</span></div>
+    <div class="findings">${g.findings.map(f => `
+      <div class="finding">
+        <span class="sev ${f.sev}">${f.sev}</span>
+        ${f.shot ? `<div class="fthumb" data-shot="${f.shot}"><img alt="" loading="lazy" onerror="this.classList.add('missing')"><div class="ph">${camIcon}</div></div>` : ""}
+        <span class="ftext">${f.t}</span>
+      </div>`).join("")}</div>
+  </div>`).join("");
+findingsPanel.querySelectorAll(".fthumb[data-shot]").forEach(el => {
+  const key = el.dataset.shot;
+  const src = (window.__SHOTS__ && window.__SHOTS__[key]) || `shots/${key}.png`;
+  el.querySelector("img").src = src;
+  el.addEventListener("click", () => openLB(src, key));
+});
+
+// ---- "More Flows" tab: a sample placeholder for sections without a flow-map yet ----
+const morePanel = document.getElementById("panel-more");
+const unmapped = groups.filter(g => !g.flows);
+morePanel.innerHTML = `
+  <div class="comingsoon">
+    <h3>More flows — coming soon <span class="tabtag">sample</span></h3>
+    <p>This tab is a placeholder showing where future create/edit/delete flow-map deep-dives will slot in,
+       the same way Tenders and Responses did. These sections are already in the Sitemap tab but don't
+       have a flow breakdown yet:</p>
+    <ul>${unmapped.map(g => `<li><b>${g.title}</b> — ${g.pages.length} page${g.pages.length === 1 ? "" : "s"}${g.lead ? " · " + g.lead : ""}</li>`).join("")}</ul>
+  </div>`;
+
+// ---- tab switching ----
+const tabButtons = document.querySelectorAll(".tab");
+const tabPanels = {
+  sitemap: document.getElementById("panel-sitemap"),
+  findings: findingsPanel,
+  more: morePanel,
+};
+tabButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    tabButtons.forEach(b => { b.classList.remove("active"); b.setAttribute("aria-selected", "false"); });
+    btn.classList.add("active"); btn.setAttribute("aria-selected", "true");
+    Object.entries(tabPanels).forEach(([key, el]) => { el.hidden = key !== btn.dataset.tab; });
+    if(btn.dataset.tab === "sitemap") requestAnimationFrame(drawLines);
+  });
+});
 </script>
 </body>
 </html>

@@ -84,10 +84,13 @@ async function shoot(page, file) {
   await ask('1) Open any TENDER DETAILS page (click a tender name), then press ENTER... ');
   await shoot(page, 'tender-details');
 
-  await ask('2) Select a document and click OPEN RAY (so the chat panel shows), then press ENTER... ');
+  await ask('2) Click BUILD TENDER (top right of Tender Details), then press ENTER... ');
+  await shoot(page, 'tender-build');
+
+  await ask('3) Go back, select a document, and click OPEN RAY (so the chat panel shows), then press ENTER... ');
   await shoot(page, 'tender-ray');
 
-  console.log('\nDone. ' + (routes.length + 2) + ' screenshots written to ./shots/');
+  console.log('\nDone. ' + (routes.length + 3) + ' screenshots written to ./shots/');
   console.log('Open index.html to see them populate the sitemap.');
   await ctx.close();
   process.exit(0);

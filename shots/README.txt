@@ -4,6 +4,7 @@ The sitemap (../index.html) auto-loads each one and shows a placeholder until it
   dashboard.png                 -> /dashboard
   tenders.png                   -> /tenders
   tender-details.png            -> /tenders/tender-details/<id>  (per-tender edit workspace)
+  tender-build.png              -> /tenders/build-tender/<id>  (Build Tender attachment assembly)
   tender-ray.png                -> Open Ray panel on a tender detail page
   tenders-awarded.png           -> /tenders/awarded-tenders
   tenders-unsuccessful.png      -> /tenders/unsuccessful-tenders

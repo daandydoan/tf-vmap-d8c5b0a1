@@ -10,9 +10,17 @@
 <style>
   :root{
     --teal:#179e77; --teal-dark:#0f6e56; --ink:#1f2422; --muted:#6b726e;
-    --line:#e3e6e3; --bg:#f6f7f5; --card:#ffffff; --pill:#eef4f1; --radius:14px;
+    --line:#e3e6e3; --bg:#f6f7f5; --card:#ffffff; --pill:#eef4f1; --radius:14px; --card-r:12px;
     --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
     --font-sans:'Outfit',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --connector:#c7cfc9; --cat-bd:#cfe2da;
+    /* single source of truth for flow-node kinds — reused by .node.k-* AND the legend swatches */
+    --k-entry-bg:#f1efe8;  --k-entry-bd:#d3d1c7;
+    --k-action-bg:#eef4f1; --k-action-bd:#cfe2da;
+    --k-ai-bg:#e1f5ee;     --k-ai-bd:#9fe1cb;
+    --k-commit-bg:#eaf3de; --k-commit-bd:#c0dd97;
+    --k-warn-bg:#faeeda;   --k-warn-bd:#fac775;
+    --k-danger-bg:#fcebeb; --k-danger-bd:#f7c1c1;
   }
   *{box-sizing:border-box}
   html,body{margin:0}
@@ -40,7 +48,7 @@
   /* site map (left-to-right tree) */
   .sitemap{position:relative;display:flex;align-items:flex-start;padding:8px 0 4px;margin-top:6px}
   .sm-lines{position:absolute;inset:0;z-index:0;pointer-events:none}
-  .sm-lines path{fill:none;stroke:#c7cfc9;stroke-width:1.5}
+  .sm-lines path{fill:none;stroke:var(--connector);stroke-width:1.5}
   .sm-root{position:relative;z-index:1;flex:0 0 auto;margin-right:60px;display:flex;flex-direction:column;gap:10px;width:158px}
   .rootnode{background:var(--teal-dark);color:#fff;border-radius:12px;padding:12px 15px;font-size:14px;font-weight:600;line-height:1.25}
   .rootnode small{display:block;font-weight:400;font-size:10px;opacity:.85;margin-top:4px;font-family:var(--mono);line-height:1.35}
@@ -48,13 +56,13 @@
   .shells b{color:var(--ink);font-weight:600}
   .sm-branches{position:relative;z-index:1;display:flex;flex-direction:column;gap:16px}
   .branch{display:flex;align-items:center;gap:60px}
-  .cat{flex:0 0 auto;width:170px;background:var(--pill);border:1px solid #cfe2da;border-radius:10px;
-    padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .cat .cn{font-size:13.5px;font-weight:600;color:var(--teal-dark)}
+  .cat{flex:0 0 auto;width:170px;background:var(--pill);border:1px solid var(--cat-bd);border-radius:var(--card-r);
+    padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .cat .cn{font-size:13px;font-weight:600;color:var(--teal-dark)}
   .cat .cc{font-size:11px;font-weight:500;color:#fff;background:var(--teal);border-radius:20px;padding:1px 8px}
   .leaves{display:flex;flex-direction:column;gap:11px}
   .leaf{display:flex;align-items:stretch;gap:10px;width:300px;background:var(--card);border:1px solid var(--line);
-    border-radius:10px;overflow:hidden;cursor:zoom-in;transition:box-shadow .15s,transform .15s}
+    border-radius:var(--card-r);overflow:hidden;cursor:zoom-in;transition:box-shadow .15s,transform .15s}
   .leaf:hover{box-shadow:0 6px 18px rgba(20,40,30,.10);transform:translateY(-1px)}
   .leaf.sub{border-style:dashed}
   .lthumb{position:relative;flex:0 0 108px;height:68px;background:#f0f2f0;overflow:hidden}
@@ -69,7 +77,7 @@
   .ln a.ext{flex:none;color:var(--muted);display:inline-flex;cursor:pointer}
   .ln a.ext:hover{color:var(--teal-dark)}
   .ln a.ext svg{width:12px;height:12px}
-  .lr{font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lr{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
   /* click-to-zoom lightbox for the small map thumbnails */
   .lb{position:fixed;inset:0;background:rgba(15,25,20,.82);display:flex;align-items:center;justify-content:center;
@@ -82,30 +90,36 @@
 
   /* flow lanes, now rendered as extra rows under a category (not a separate section) */
   .rows{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:16px}
-  .maplegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:2px 0 18px;font-size:11.5px;color:var(--muted)}
+  .maplegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:2px 0 18px;font-size:11px;color:var(--muted)}
   .maplegend span{display:inline-flex;align-items:center;gap:6px}
   .maplegend i{width:11px;height:11px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.08)}
-  .lanewrap{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px 10px}
+  .maplegend i.k-entry {background:var(--k-entry-bg)}
+  .maplegend i.k-action{background:var(--k-action-bg)}
+  .maplegend i.k-ai    {background:var(--k-ai-bg)}
+  .maplegend i.k-commit{background:var(--k-commit-bg)}
+  .maplegend i.k-warn  {background:var(--k-warn-bg)}
+  .maplegend i.k-danger{background:var(--k-danger-bg)}
+  .lanewrap{background:var(--card);border:1px solid var(--line);border-radius:var(--card-r);padding:14px 18px 12px}
   .lane-label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--teal-dark);margin:0 0 10px}
   .pipe{display:flex;align-items:stretch;overflow-x:auto;padding-bottom:4px}
   .col{display:flex;flex-direction:column;gap:8px;justify-content:center;flex:1 1 150px;min-width:148px}
   .colhdr{font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin-bottom:-2px}
-  .arrow{flex:0 0 auto;display:flex;align-items:center;color:#b7c0bb;padding:0 9px}
+  .arrow{flex:0 0 auto;display:flex;align-items:center;color:var(--connector);padding:0 9px}
   .arrow svg{width:17px;height:17px}
-  .node{border:1px solid var(--line);border-radius:10px;padding:8px 11px;background:var(--card)}
-  .node .nt{font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.25;display:flex;align-items:center;gap:6px}
+  .node{border:1px solid var(--line);border-radius:var(--card-r);padding:9px 12px;background:var(--card)}
+  .node .nt{font-size:13px;font-weight:600;color:var(--ink);line-height:1.25;display:flex;align-items:center;gap:6px}
   .node .nt svg{width:13px;height:13px;flex:none}
-  .node .ns{font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.35}
-  .node.k-entry  {background:#f1efe8;border-color:#d3d1c7}
-  .node.k-action {background:#eef4f1;border-color:#cfe2da}
-  .node.k-ai     {background:#e1f5ee;border-color:#9fe1cb}
-  .node.k-commit {background:#eaf3de;border-color:#c0dd97}
-  .node.k-danger {background:#fcebeb;border-color:#f7c1c1}
-  .node.k-warn   {background:#faeeda;border-color:#fac775}
+  .node .ns{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.35}
+  .node.k-entry  {background:var(--k-entry-bg);border-color:var(--k-entry-bd)}
+  .node.k-action {background:var(--k-action-bg);border-color:var(--k-action-bd)}
+  .node.k-ai     {background:var(--k-ai-bg);border-color:var(--k-ai-bd)}
+  .node.k-commit {background:var(--k-commit-bg);border-color:var(--k-commit-bd)}
+  .node.k-danger {background:var(--k-danger-bg);border-color:var(--k-danger-bd)}
+  .node.k-warn   {background:var(--k-warn-bg);border-color:var(--k-warn-bd)}
   .node code,.finding code{font-family:var(--mono);font-size:11px;background:var(--pill);color:var(--teal-dark);padding:1px 5px;border-radius:5px;word-break:break-word}
 
-  .findings{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 20px 10px}
-  .findings h3{font-size:14px;font-weight:600;margin:14px 0 6px;display:flex;align-items:center;gap:8px}
+  .findings{background:var(--card);border:1px solid var(--line);border-radius:var(--card-r);padding:14px 18px 12px}
+  .findings h3{font-size:14px;font-weight:600;margin:0 0 10px;display:flex;align-items:center;gap:8px}
   .finding{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:12.5px}
   .finding:first-of-type{border-top:0}
   .sev{flex:none;font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;border-radius:5px;padding:3px 8px;height:fit-content;min-width:54px;text-align:center}
@@ -142,8 +156,8 @@
 </div>
 
 <footer class="foot">
-  Generated from a full navigation crawl of the staging environment · 21 views across 6 sections,
-  with Tenders and Responses branching further into their create/edit/delete flow maps and findings.
+  Generated from a full navigation crawl of the staging environment · 22 views across 6 sections,
+  with Tenders (including Build Tender) and Responses branching further into their flow maps and findings.
   Persistent across all pages: top header (Home · AI Manager · Support · Settings · Notifications · Profile)
   and the collapsible left sidebar.
 </footer>
@@ -158,6 +172,7 @@ const groups = [
   { title:"Tenders", lead:"Tender pipeline, the per-tender detail/edit workspace, and outcome views.", pages:[
     { name:"Tenders", route:"/tenders", file:"tenders", note:"All / My Tenders · list & grid · priority filter · folders · Create New Tender" },
     { name:"Tender Details (edit)", route:"/tenders/tender-details/<id>", file:"tender-details", note:"Per-tender workspace — info · checklist · documentation · notes · Build / Update / Delete", sub:true, noopen:true },
+    { name:"Build Tender (attachments)", route:"/tenders/build-tender/<id>", file:"tender-build", note:"Assembles cover · docs · resumes · policies · certs into a submission package", sub:true, noopen:true },
     { name:"Ray — AI co-pilot", route:"Open Ray (right panel)", file:"tender-ray", note:"RAG chat over selected docs · inline citations · Deep Thinking · Save Prompt", sub:true, noopen:true },
     { name:"Awarded Tenders", route:"/tenders/awarded-tenders", file:"tenders-awarded", note:"Outcome view — awarded", sub:true },
     { name:"Unsuccessful Tenders", route:"/tenders/unsuccessful-tenders", file:"tenders-unsuccessful", note:"Outcome view — unsuccessful", sub:true },
@@ -182,12 +197,27 @@ const groups = [
         {nt:"Delete Tender", k:"danger", ns:"confirm has no Cancel"},
       ]},
     ]},
+    { lane:"Build a tender pack", stages:[
+      { nodes:[{nt:"Tender Details", k:"entry", ns:"header: Build Tender button"}] },
+      { nodes:[{nt:"Tender Attachments", k:"action", ns:"<code>/tenders/build-tender/&lt;id&gt;</code> · 10 categories mirror File Manager"}] },
+      { hdr:"per category", nodes:[
+        {nt:"+ Add &lt;Category&gt;", k:"action", ns:"real library picker — mirrors File Manager (e.g. Certifications tabs)"},
+        {nt:"Template icon", k:"warn", ns:"separate shared divider/cover picker — easy to confuse with Add"},
+      ]},
+      { hdr:"commit", nodes:[
+        {nt:"Add to Tender", k:"commit", ns:"POST /build — persists immediately, per item"},
+        {nt:"Remove From Tender", k:"danger", ns:"same endpoint · also instant"},
+        {nt:"Save Changes", k:"warn", ns:"purpose unclear — add/remove already saved without it"},
+      ]},
+    ]},
   ], findings:[
     { sev:"bug", t:"<b>Add Task throws on open.</b> <code>TypeError: Cannot read properties of null (reading 'inProgress')</code> — caught by the global handler and surfaced as a generic “Something went wrong” toast. Tied to time-tracking (Start Time) state; reproduces across accounts." },
     { sev:"ux", t:"<b>Delete confirm has no labeled Cancel</b> — only the red destructive button + an X, while every other modal here has a Cancel. It also doesn't name the tender and offers no undo." },
     { sev:"copy", t:"<b>Delete confirm grammar:</b> “Are you sure want to delete this tender?” → “Are you sure you want to delete this tender?”" },
     { sev:"ux", t:"<b>AI-action naming is inconsistent</b> — “AI Review” in the list/grid kebab vs “Build Tender” / “Open Ray” on the detail page." },
     { sev:"ux", t:"<b>Bulk file actions are easy to miss</b> — selecting documents reveals Add to Folder / Open Ray in the panel header, far above the file grid." },
+    { sev:"ux", t:"<b>Build Tender's Add/Remove persist immediately</b> — no confirmation, no “unsaved changes” state — while a prominent <b>Save Changes</b> button sits right next to them implying otherwise." },
+    { sev:"ux", t:"<b>Two unrelated “add” controls per category</b> in Build Tender — a small icon opens a generic template/divider picker, “+ Add X” opens the real document library — with nothing visually distinguishing them." },
   ]},
   { title:"Responses", lead:"Reusable Question + Response library (261 records).", pages:[
     { name:"Responses", route:"/responses", file:"responses", note:"Search · Add / Edit / Delete · Copy · Tags · AI Enhancement · folders" },
@@ -253,8 +283,8 @@ const extIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 const ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></svg>';
 const SPARK = '<svg viewBox="0 0 24 24" fill="#0f6e56" aria-hidden="true"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z"/></svg>';
 const WARN  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.8 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>';
-const LEGEND = ['entry:#f1efe8','action:#eef4f1','AI:#e1f5ee','commit:#eaf3de','issue:#faeeda','destructive:#fcebeb']
-  .map(p => { const [l,c] = p.split(':'); return `<span><i style="background:${c}"></i>${l}</span>`; }).join('');
+const KINDS = [['entry','entry'],['action','action'],['ai','AI'],['commit','commit'],['warn','issue'],['danger','destructive']];
+const LEGEND = KINDS.map(([k,label]) => `<span><i class="k-${k}"></i>${label}</span>`).join('');
 
 function nodeHtml(n){
   const ic = n.k === 'ai' ? SPARK : (n.k === 'warn' || n.k === 'danger') ? WARN : '';

@@ -110,6 +110,12 @@
   .node .nt{font-size:13px;font-weight:600;color:var(--ink);line-height:1.25;display:flex;align-items:center;gap:6px}
   .node .nt svg{width:13px;height:13px;flex:none}
   .node .ns{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.35}
+  .nthumb{position:relative;width:100%;aspect-ratio:16/10;border-radius:6px;overflow:hidden;background:#eef1ee;margin-bottom:7px}
+  .nthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+  .nthumb img.missing{display:none}
+  .nthumb .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#aab2ac}
+  .nthumb .ph svg{width:15px;height:15px;opacity:.6}
+  .nthumb img:not(.missing) + .ph{display:none}
   .node.k-entry  {background:var(--k-entry-bg);border-color:var(--k-entry-bd)}
   .node.k-action {background:var(--k-action-bg);border-color:var(--k-action-bd)}
   .node.k-ai     {background:var(--k-ai-bg);border-color:var(--k-ai-bd)}
@@ -183,36 +189,36 @@ const groups = [
     { name:"Unsuccessful Tenders", route:"/tenders/unsuccessful-tenders", file:"tenders-unsuccessful", note:"Outcome view — unsuccessful", sub:true },
   ], flows:[
     { lane:"Create a tender", stages:[
-      { nodes:[{nt:"Tenders list", k:"entry", ns:"all / my · list · grid · search · filter"}] },
-      { nodes:[{nt:"Create New Tender", k:"action", ns:"modal — Status · Priority · Assignee"}] },
-      { nodes:[{nt:"Tender Info + Documents", k:"action", ns:"Name* · contacts · dates · upload PDF/DOC/…"}] },
-      { nodes:[{nt:"Create Tender", k:"commit", ns:"saves new tender"}] },
+      { nodes:[{nt:"Tenders list", k:"entry", ns:"all / my · list · grid · search · filter", shot:"tenders"}] },
+      { nodes:[{nt:"Create New Tender", k:"action", ns:"modal — Status · Priority · Assignee", shot:"modal-create-tender"}] },
+      { nodes:[{nt:"Tender Info + Documents", k:"action", ns:"Name* · contacts · dates · upload PDF/DOC/…", shot:"modal-create-tender"}] },
+      { nodes:[{nt:"Create Tender", k:"commit", ns:"saves new tender", shot:"modal-create-tender"}] },
     ]},
     { lane:"Manage a tender", stages:[
-      { nodes:[{nt:"Open a tender", k:"entry", ns:"click row / card"}] },
-      { nodes:[{nt:"Tender Details", k:"action", ns:"<code>/tenders/tender-details/&lt;id&gt;</code>"}] },
+      { nodes:[{nt:"Open a tender", k:"entry", ns:"click row / card", shot:"tenders"}] },
+      { nodes:[{nt:"Tender Details", k:"action", ns:"<code>/tenders/tender-details/&lt;id&gt;</code>", shot:"tender-details"}] },
       { hdr:"workspace", nodes:[
-        {nt:"Tender information", k:"action", ns:"inline-editable fields"},
-        {nt:"Checklist · Add Task", k:"warn", ns:"throws on open (inProgress)"},
-        {nt:"Documentation → Open Ray", k:"ai", ns:"select files · RAG chat + citations"},
-        {nt:"Notes", k:"action", ns:"Add Notes"},
+        {nt:"Tender information", k:"action", ns:"inline-editable fields", shot:"tender-details"},
+        {nt:"Checklist · Add Task", k:"warn", ns:"throws on open (inProgress)", shot:"modal-add-task"},
+        {nt:"Documentation → Open Ray", k:"ai", ns:"select files · RAG chat + citations", shot:"tender-ray"},
+        {nt:"Notes", k:"action", ns:"Add Notes", shot:"modal-add-notes"},
       ]},
       { hdr:"commit / remove", nodes:[
-        {nt:"Update Tender", k:"commit", ns:"saves changes"},
-        {nt:"Delete Tender", k:"danger", ns:"confirm has no Cancel"},
+        {nt:"Update Tender", k:"commit", ns:"saves changes", shot:"tender-details"},
+        {nt:"Delete Tender", k:"danger", ns:"confirm has no Cancel · warns if another user is on Build Tender", shot:"modal-delete-tender"},
       ]},
     ]},
     { lane:"Build a tender pack", stages:[
-      { nodes:[{nt:"Tender Details", k:"entry", ns:"header: Build Tender button"}] },
-      { nodes:[{nt:"Tender Attachments", k:"action", ns:"<code>/tenders/build-tender/&lt;id&gt;</code> · 10 categories mirror File Manager"}] },
+      { nodes:[{nt:"Tender Details", k:"entry", ns:"header: Build Tender button", shot:"tender-details"}] },
+      { nodes:[{nt:"Tender Attachments", k:"action", ns:"<code>/tenders/build-tender/&lt;id&gt;</code> · 10 categories mirror File Manager", shot:"tender-build"}] },
       { hdr:"per category", nodes:[
-        {nt:"+ Add &lt;Category&gt;", k:"action", ns:"real library picker — mirrors File Manager (e.g. Certifications tabs)"},
-        {nt:"Template icon", k:"warn", ns:"separate shared divider/cover picker — easy to confuse with Add"},
+        {nt:"+ Add &lt;Category&gt;", k:"action", ns:"real library picker — mirrors File Manager (e.g. Certifications tabs)", shot:"modal-add-category"},
+        {nt:"Template icon", k:"warn", ns:"separate shared divider/cover picker — easy to confuse with Add", shot:"tender-build"},
       ]},
       { hdr:"commit", nodes:[
-        {nt:"Add to Tender", k:"commit", ns:"POST /build — persists immediately, per item"},
-        {nt:"Remove From Tender", k:"danger", ns:"same endpoint · also instant"},
-        {nt:"Save Changes", k:"warn", ns:"purpose unclear — add/remove already saved without it"},
+        {nt:"Add to Tender", k:"commit", ns:"POST /build — persists immediately, per item", shot:"modal-add-category"},
+        {nt:"Remove From Tender", k:"danger", ns:"same endpoint · also instant", shot:"tender-build"},
+        {nt:"Save Changes", k:"warn", ns:"purpose unclear — add/remove already saved without it", shot:"tender-build"},
       ]},
     ]},
   ], findings:[
@@ -293,7 +299,10 @@ const LEGEND = KINDS.map(([k,label]) => `<span><i class="k-${k}"></i>${label}</s
 
 function nodeHtml(n){
   const ic = n.k === 'ai' ? SPARK : (n.k === 'warn' || n.k === 'danger') ? WARN : '';
-  return `<div class="node k-${n.k}"><div class="nt">${ic}<span>${n.nt}</span></div>${n.ns ? `<div class="ns">${n.ns}</div>` : ''}</div>`;
+  const thumb = n.shot
+    ? `<div class="nthumb" data-shot="${n.shot}" data-cap="${n.nt.replace(/<[^>]+>/g, '').replace(/"/g, '&quot;')}"><img alt="" loading="lazy" onerror="this.classList.add('missing')"><div class="ph">${camIcon}</div></div>`
+    : '';
+  return `<div class="node k-${n.k}">${thumb}<div class="nt">${ic}<span>${n.nt}</span></div>${n.ns ? `<div class="ns">${n.ns}</div>` : ''}</div>`;
 }
 
 // ---- render the whole thing as ONE tree: root -> category -> (page leaves + flow lanes) ----
@@ -363,6 +372,15 @@ for(const g of groups){
 }
 sm.appendChild(branches);
 root.appendChild(sm);
+
+// wire up flow-node thumbnails (added via nodeHtml's data-shot) to the same lightbox
+sm.querySelectorAll(".nthumb[data-shot]").forEach(el => {
+  const key = el.dataset.shot;
+  const src = (window.__SHOTS__ && window.__SHOTS__[key]) || `shots/${key}.png`;
+  el.querySelector("img").src = src;
+  el.style.cursor = "zoom-in";
+  el.addEventListener("click", () => openLB(src, el.dataset.cap));
+});
 
 // lightbox (small map thumbnails -> full screenshot on click)
 const lb = document.createElement("div");

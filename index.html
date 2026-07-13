@@ -159,6 +159,29 @@
   .fgrouptitle{font-size:13px;font-weight:600;color:var(--teal-dark);margin:0 0 10px;display:flex;align-items:center;gap:8px}
   .fgrouptitle .cc{font-size:11px;font-weight:500;color:#fff;background:var(--teal);border-radius:20px;padding:1px 8px}
 
+  /* Audit tab */
+  .auditintro{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 20px;margin-bottom:22px;font-size:13px;color:var(--muted);line-height:1.6}
+  .auditintro b{color:var(--ink);font-weight:600}
+  .agroup{margin-bottom:26px}
+  .agroup:last-child{margin-bottom:0}
+  .agrouptitle{font-size:13px;font-weight:600;color:var(--teal-dark);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .agrouptitle .cc{font-size:11px;font-weight:500;color:#fff;background:var(--teal);border-radius:20px;padding:1px 8px}
+  .audittablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--card-r);background:var(--card)}
+  .audittable{width:100%;border-collapse:collapse;font-size:12.5px;min-width:640px}
+  .audittable th{text-align:left;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;
+    color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--line);background:var(--pill);white-space:nowrap}
+  .audittable td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.55;color:var(--ink)}
+  .audittable tr:last-child td{border-bottom:0}
+  .audittable td:first-child{width:30%;font-weight:500}
+  .audittable td:nth-child(2){width:52%;color:var(--muted)}
+  .audittable td:last-child{width:12%}
+  .prio{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
+    border-radius:5px;padding:3px 9px;white-space:nowrap}
+  .prio.high{background:#fcebeb;color:#a32d2d}
+  .prio.medium{background:#faeeda;color:#854f0b}
+  .prio.low{background:#eef1f6;color:#3a5a86}
+
   /* More Flows (sample) tab */
   .comingsoon{background:var(--card);border:1px dashed var(--line);border-radius:var(--card-r);padding:18px 22px}
   .comingsoon h3{font-size:15px;font-weight:600;margin:0 0 8px;display:flex;align-items:center;gap:9px}
@@ -196,6 +219,7 @@
   <div class="tabbar" role="tablist">
     <button class="tab active" role="tab" aria-selected="true" data-tab="sitemap">Sitemap</button>
     <button class="tab" role="tab" aria-selected="false" data-tab="findings">Findings &amp; Bugs</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="audit">Audit</button>
     <button class="tab" role="tab" aria-selected="false" data-tab="more">More Flows <span class="tabtag">sample</span></button>
   </div>
 
@@ -203,6 +227,8 @@
   <div class="tabpanel" id="panel-sitemap" role="tabpanel"></div>
   <!-- consolidated findings, injected by script -->
   <div class="tabpanel" id="panel-findings" role="tabpanel" hidden></div>
+  <!-- UI/UX + usability audit table, injected by script -->
+  <div class="tabpanel" id="panel-audit" role="tabpanel" hidden></div>
   <!-- placeholder for not-yet-mapped sections, injected by script -->
   <div class="tabpanel" id="panel-more" role="tabpanel" hidden></div>
 
@@ -211,7 +237,7 @@
 <footer class="foot">
   Generated from a full navigation crawl of the staging environment · 22 views across 6 sections,
   with Tenders (including Build Tender) and Responses branching further into their flow maps.
-  Findings & bugs consolidated in their own tab; More Flows is a placeholder for sections not yet mapped.
+  Findings & bugs and the UI/UX audit are consolidated in their own tabs; More Flows is a placeholder for sections not yet mapped.
   Persistent across all pages: top header (Home · AI Manager · Support · Settings · Notifications · Profile)
   and the collapsible left sidebar.
 </footer>
@@ -475,6 +501,59 @@ findingsPanel.querySelectorAll(".fthumb[data-shot]").forEach(el => {
   el.addEventListener("click", () => openLB(src, key));
 });
 
+// ---- Audit tab: consolidated UI/UX & usability review across the whole crawl ----
+const auditGroups = [
+  { title:"Global / cross-cutting", items:[
+    { issue:"Left sidebar collapses to icon-only after every navigation — users have to re-expand it repeatedly to see section labels.", sug:"Persist the expanded/collapsed state across navigations (session or user preference), not just within a single page.", prio:"medium" },
+    { issue:"Two header icons (a “sheep” icon → AI Manager, a headset icon → Support) have no text labels, and the headset icon has no working route.", sug:"Add tooltips/labels to all header icons at minimum; fix or remove the dead Support icon.", prio:"medium" },
+    { issue:"The AI assistant is labeled differently in at least 4 places: “AI Review” (Tenders kebab), “Build Tender”/“Open Ray” (Tender Details), and the document-scoped Ray chat panel inside Document Workspace.", sug:"Standardize on one name (“Ray”) and one icon everywhere the assistant appears.", prio:"medium" },
+    { issue:"Inconsistent verbs for the same action across File Manager sections (Upload / Create / Add New X), and “Organisation Chart” in the UI vs <code>organization-chart</code> in the URL (AU/US spelling mismatch).", sug:"Pick one verb per action type and one spelling convention; apply consistently across labels and routes.", prio:"low" },
+    { issue:"Cover Pages, Table of Contents, and Document Workspace are categorized three different ways: under Tenders in the sidebar, under <code>/file-manager/</code> in the URL structure, and under “Dashboard / Tenders” in the new permission matrix.", sug:"Pick one canonical grouping and align nav, routing, and permissions to it — the current mismatch will confuse both end users and admins configuring roles.", prio:"medium" },
+    { issue:"Delete-confirmation pattern is inconsistent app-wide: Response deletion has a labeled Cancel button; Tender deletion has only a red destructive button + a bare X, doesn't name the tender being deleted, and has a grammar error (“Are you sure want to delete this tender?”).", sug:"Standardize on one destructive-confirm component (icon + item name + labeled Cancel + labeled destructive action) everywhere; fix the copy.", prio:"high" },
+  ]},
+  { title:"Dashboard", items:[
+    { issue:"A large, dismissible “ANNOUNCEMENT” banner (promoting the new AI features) pushes the KPI cards below the fold on first load.", sug:"Make the banner more compact or collapsed-by-default so KPIs — the primary reason to land on this page — stay above the fold.", prio:"medium" },
+  ]},
+  { title:"Tenders", items:[
+    { issue:"Clicking “Add Task” throws <code>TypeError: Cannot read properties of null (reading 'inProgress')</code>, caught by the global handler and shown as a generic “Something went wrong” toast. Tied to time-tracking state; reproduces consistently.", sug:"Fix the null check on the time-tracking/<code>inProgress</code> state before rendering the Add Task modal.", prio:"high" },
+    { issue:"Build Tender's Add/Remove document actions persist immediately (no confirmation, no “unsaved changes” indicator), yet a prominent “Save Changes” button sits right next to them, implying otherwise.", sug:"Either make Save Changes meaningful (batch the changes) or remove it and communicate that actions are instant.", prio:"medium" },
+    { issue:"Two visually similar but functionally different “add” controls per category in Build Tender — a small template/divider-picker icon vs. “+ Add ⟨Category⟩” (the real document library) — nothing distinguishes them.", sug:"Differentiate visually (icon, label, grouping) or merge into one clear entry point, following the Document Workspace mode-picker's card+explanation pattern (see below).", prio:"medium" },
+    { issue:"Bulk file actions (Add to Folder, Open Ray) only appear in the panel header once files are selected, far above the file grid — easy to miss.", sug:"Surface bulk actions closer to the selected rows (e.g. a floating action bar).", prio:"low" },
+  ]},
+  { title:"Responses", items:[
+    { issue:"The row checkbox sits hard against the expand chevron — easy to mis-hit and expand the row instead of selecting it.", sug:"Add spacing/a larger hit target between the checkbox and the expander.", prio:"low" },
+    { issue:"Apparent duplicate records (e.g. “Detailed explanation and proposed alternative:” appears twice on page one of 261).", sug:"Run a dedupe/merge pass across the Response library.", prio:"low" },
+  ]},
+  { title:"File manager", items:[
+    { issue:"The 9 sibling sections (Resumes, Case Studies, Policies, Insurances, Certifications, Org Chart, Others, etc.) have no in-page tab bar for lateral navigation — users must return to the sidebar to switch between them.", sug:"Add an in-page tab bar, matching the pattern already used correctly in Settings and AI Manager.", prio:"medium" },
+  ]},
+  { title:"Document Workspace", items:[
+    { issue:"Selecting “Q&amp;A Workspace” fires real, credit-consuming AI generation instantly on card click — no confirmation, no cost preview. A toast appears after the fact with no way to undo.", sug:"Add a confirmation step before generation starts, matching what Autofill already does.", prio:"high" },
+    { issue:"“Autofill” shows a second “Use Autofill?” dialog warning about complex tenders before committing, but Q&amp;A Workspace has no equivalent — the safety net is inconsistent and mode-dependent.", sug:"Apply the same confirm-before-generate pattern to all three modes uniformly.", prio:"high" },
+    { issue:"Mode selection is permanently sticky per document — once run through a mode, reopening always reloads that same mode, with no visible indicator anywhere on the Tender Details file list of which mode a document is locked into.", sug:"Show the assigned mode as a badge on the document thumbnail alongside the existing “Analysis completed” pill.", prio:"medium" },
+    { issue:"Autofill's results are a merge-field/fill-in-the-blank view; Q&amp;A Workspace's results are a question-card list. Both share the same action set (Generate with AI, Generate from File, Add to Response Library, Assign User) but look and feel like two unrelated products.", sug:"Unify on one shared “extracted item” component across modes so switching between them doesn't require relearning the UI.", prio:"low" },
+    { issue:"Q&amp;A Workspace can extract 299 questions into only two tabs (Assigned / All) with no search, filter, or index.", sug:"Add search/filter — essential at this scale.", prio:"high" },
+    { issue:"Entering Document Workspace fully replaces the app shell (no sidebar, no header) — the only way out is a small “Go back” link, whose click target proved unreliable during testing (required retries at adjusted coordinates).", sug:"Keep standard chrome present (even collapsed), and verify the Go back hit target isn't clipped.", prio:"medium" },
+  ]},
+];
+const auditPanel = document.getElementById("panel-audit");
+auditPanel.innerHTML = `
+  <div class="auditintro"><b>UI/UX &amp; usability audit</b> — every issue surfaced across the full crawl (Dashboard,
+    Tenders, Responses, File Manager, Manage Staff, Settings and the Document Workspace flow-map), rated by priority.
+    One positive pattern worth reusing: the “Complete this RFP with Ray” mode picker (cards + plain-language
+    recommendation + explicit warning banner) is clearer than most of the app's other multi-option flows — it would
+    fix the ambiguous “two add controls” issue in Build Tender if applied there.</div>
+  ${auditGroups.map(g => `
+  <div class="agroup">
+    <div class="agrouptitle">${g.title} <span class="cc">${g.items.length}</span></div>
+    <div class="audittablewrap"><table class="audittable">
+      <thead><tr><th>Issue</th><th>Suggestion</th><th>Priority</th></tr></thead>
+      <tbody>${g.items.map(it => `
+        <tr><td>${it.issue}</td><td>${it.sug}</td><td><span class="prio ${it.prio}">${it.prio}</span></td></tr>`).join("")}
+      </tbody>
+    </table></div>
+  </div>`).join("")}`;
+
 // ---- "More Flows" tab: a sample placeholder for sections without a flow-map yet ----
 const morePanel = document.getElementById("panel-more");
 const unmapped = groups.filter(g => !g.flows);
@@ -492,6 +571,7 @@ const tabButtons = document.querySelectorAll(".tab");
 const tabPanels = {
   sitemap: document.getElementById("panel-sitemap"),
   findings: findingsPanel,
+  audit: auditPanel,
   more: morePanel,
 };
 tabButtons.forEach(btn => {
